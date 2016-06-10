@@ -13,12 +13,12 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 
-public class ColdObservable<T> extends Observable<T> implements TestableObservable<T> {
+public class HotObservable<T> extends Observable<T> implements TestableObservable<T> {
 
     public final Recorded<Notification<T>>[] notifications;
     public List<SubscriptionLog> subscriptions = new ArrayList<>();
 
-    private ColdObservable(OnSubscribe<T> f, Recorded<Notification<T>>[] notifications) {
+    protected HotObservable(OnSubscribe<T> f, Recorded<Notification<T>>[] notifications) {
         super(f);
         this.notifications = notifications;
     }
@@ -33,40 +33,40 @@ public class ColdObservable<T> extends Observable<T> implements TestableObservab
         return Arrays.asList(notifications);
     }
 
-    public static <T> ColdObservable<T> create(Scheduler scheduler, Recorded<Notification<T>>... notifications) {
+    public static <T> HotObservable<T> create(Scheduler scheduler, Recorded<Notification<T>>... notifications) {
         OnSubscribeHandler<T> onSubscribeFunc = new OnSubscribeHandler<>(scheduler, notifications);
-        ColdObservable<T> observable = new ColdObservable<>(onSubscribeFunc, notifications);
+        HotObservable<T> observable = new HotObservable<>(onSubscribeFunc, notifications);
         onSubscribeFunc.observable = observable;
         return observable;
     }
 
-
     private static class OnSubscribeHandler<T> implements Observable.OnSubscribe<T> {
 
         private final Scheduler scheduler;
-        private final Recorded<Notification<T>>[] notifications;
+        private final List<Subscriber<? super T>> subscribers = new ArrayList<>();
         public TestableObservable<T> observable;
 
         public OnSubscribeHandler(Scheduler scheduler, Recorded<Notification<T>>[] notifications) {
             this.scheduler = scheduler;
-            this.notifications = notifications;
+            Scheduler.Worker worker = scheduler.createWorker();
+            for (final Recorded<Notification<T>> event : notifications) {
+                worker.schedule(new Action0() {
+                    @Override
+                    public void call() {
+                        for (Subscriber<? super T> subscriber : subscribers){
+                            event.value.accept(subscriber);
+                        }
+                    }
+                }, event.time, TimeUnit.MILLISECONDS);
+            }
         }
 
         public void call(final Subscriber<? super T> subscriber) {
             final SubscriptionLog subscriptionLog = new SubscriptionLog(scheduler.now());
             observable.getSubscriptions().add(subscriptionLog);
             final int subscriptionIndex = observable.getSubscriptions().size() - 1;
-            Scheduler.Worker worker = scheduler.createWorker();
-            subscriber.add(worker); // not scheduling after unsubscribe
 
-            for (final Recorded<Notification<T>> notification: notifications) {
-                worker.schedule(new Action0() {
-                    @Override
-                    public void call() {
-                        notification.value.accept(subscriber);
-                    }
-                }, notification.time, TimeUnit.MILLISECONDS);
-            }
+            subscribers.add(subscriber);
 
             subscriber.add((Subscriptions.create(new Action0() {
                 @Override
@@ -76,6 +76,7 @@ public class ColdObservable<T> extends Observable<T> implements TestableObservab
                             subscriptionIndex,
                             new SubscriptionLog(subscriptionLog.subscribe, scheduler.now())
                     );
+                    subscribers.remove(subscriber);
                 }
             })));
         }
