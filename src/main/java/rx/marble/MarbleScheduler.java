@@ -35,4 +35,15 @@ public class MarbleScheduler extends TestScheduler {
         List<Recorded<Notification<T>>> notifications = Parser.parseMarbles(marbles, values, null, frameTimeFactor);
         return HotObservable.create(this, notifications);
     }
+
+    public long createTime(String marbles) {
+        int endIndex = marbles.indexOf("|");
+        if (endIndex == -1)
+        {
+            throw new RuntimeException("Marble diagram for time should have a completion marker '|'");
+        }
+
+        return endIndex * frameTimeFactor;
+    }
+
 }
