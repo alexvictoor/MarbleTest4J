@@ -21,7 +21,7 @@ public class ParserTest {
         Map<String, Object> events = new HashMap<>();
         events.put("a", "A");
         events.put("b", "B");
-        List<Recorded<Notification<Object>>> result = Parser.parseMarbles("-------a---b---|", events);
+        List<Recorded<Notification<Object>>> result = Parser.parseMarbles("-------a---b---|", events, 10);
 
         assertThat(result).containsExactly(
                 new Recorded<>(70, Notification.createOnNext((Object)"A")),
@@ -36,7 +36,7 @@ public class ParserTest {
         Map<String, Object> events = new HashMap<>();
         events.put("a", "A");
         events.put("b", "B");
-        List<Recorded<Notification<Object>>> result = Parser.parseMarbles("--a--b--|   ", events);
+        List<Recorded<Notification<Object>>> result = Parser.parseMarbles("--a--b--|   ", events, 10);
 
         assertThat(result).containsExactly(
                 new Recorded<>(20, Notification.createOnNext((Object)"A")),
@@ -51,7 +51,7 @@ public class ParserTest {
         Map<String, Object> events = new HashMap<>();
         events.put("a", "A");
         events.put("b", "B");
-        List<Recorded<Notification<Object>>> result = Parser.parseMarbles("---^---a---b---|", events);
+        List<Recorded<Notification<Object>>> result = Parser.parseMarbles("---^---a---b---|", events, 10);
 
         assertThat(result).containsExactly(
                 new Recorded<>(40, Notification.createOnNext((Object)"A")),
@@ -67,7 +67,7 @@ public class ParserTest {
         Map<String, Object> events = new HashMap<>();
         events.put("a", "A");
         events.put("b", "B");
-        List<Recorded<Notification<Object>>> result = Parser.parseMarbles("-------a---b---#", events, errorValue);
+        List<Recorded<Notification<Object>>> result = Parser.parseMarbles("-------a---b---#", events, errorValue, 10);
 
         assertThat(result).containsExactly(
                 new Recorded<>(70, Notification.createOnNext((Object)"A")),
@@ -79,7 +79,7 @@ public class ParserTest {
     @Test
     public void should_default_in_the_letter_for_the_value_if_no_value_hash_was_passed()
     {
-        List<Recorded<Notification<String>>> result = Parser.parseMarbles("--a--b--|");
+        List<Recorded<Notification<String>>> result = Parser.parseMarbles("--a--b--|", 10);
 
         assertThat(result).containsExactly(
                 new Recorded<>(20, Notification.createOnNext("a")),
@@ -91,7 +91,7 @@ public class ParserTest {
     @Test
     public void should_handle_grouped_values()
     {
-        List<Recorded<Notification<String>>> result = Parser.parseMarbles("---(abc)---");
+        List<Recorded<Notification<String>>> result = Parser.parseMarbles("---(abc)---", 10);
 
         assertThat(result).containsExactly(
                 new Recorded<>(30, Notification.createOnNext("a")),
@@ -103,7 +103,7 @@ public class ParserTest {
     @Test
     public void should_handle_grouped_values_at_zero_time()
     {
-        List<Recorded<Notification<String>>> result = Parser.parseMarbles("(abc)---");
+        List<Recorded<Notification<String>>> result = Parser.parseMarbles("(abc)---", 10);
 
         assertThat(result).containsExactly(
                 new Recorded<>(0, Notification.createOnNext("a")),
@@ -115,7 +115,7 @@ public class ParserTest {
     @Test
     public void should_handle_value_after_grouped_values()
     {
-        List<Recorded<Notification<String>>> result = Parser.parseMarbles("---(abc)d--");
+        List<Recorded<Notification<String>>> result = Parser.parseMarbles("---(abc)d--", 10);
 
         assertThat(result).containsExactly(
                 new Recorded<>(30, Notification.createOnNext("a")),

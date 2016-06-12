@@ -3,7 +3,6 @@ package rx.marble;
 import rx.Notification;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -16,7 +15,7 @@ public class Parser {
     public static <T> List<Recorded<Notification<T>>> parseMarbles(String marbles,
                                                                    Map<String, T> values,
                                                                    Exception errorValue,
-                                                                   int frameTimeFactor,
+                                                                   long frameTimeFactor,
                                                                    boolean materializeInnerObservables)
     {
 
@@ -28,7 +27,7 @@ public class Parser {
         int len = marbles.length();
         List<Recorded<Notification<T>>> testMessages = new ArrayList<>();
         int subIndex = marbles.indexOf('^');
-        int frameOffset = subIndex == -1 ? 0 : (subIndex * -frameTimeFactor);
+        long frameOffset = subIndex == -1 ? 0 : (subIndex * -frameTimeFactor);
 
         long groupStart = -1;
 
@@ -86,15 +85,15 @@ public class Parser {
         return testMessages;
     }
 
-    public static <T> List<Recorded<Notification<T>>> parseMarbles(String marbles, Map<String, T> values) {
-        return parseMarbles(marbles, values, null);
+    public static <T> List<Recorded<Notification<T>>> parseMarbles(String marbles, Map<String, T> values, long frameTimeFactor) {
+        return parseMarbles(marbles, values, null, frameTimeFactor);
     }
 
-    public static <T> List<Recorded<Notification<T>>> parseMarbles(String marbles, Map<String, T> values, Exception errorValue) {
-        return parseMarbles(marbles, values, errorValue, 10, false);
+    public static <T> List<Recorded<Notification<T>>> parseMarbles(String marbles, Map<String, T> values, Exception errorValue, long frameTimeFactor) {
+        return parseMarbles(marbles, values, errorValue, frameTimeFactor, false);
     }
 
-    public static List<Recorded<Notification<String>>> parseMarbles(String marbles) {
-        return parseMarbles(marbles, null);
+    public static List<Recorded<Notification<String>>> parseMarbles(String marbles, long frameTimeFactor) {
+        return parseMarbles(marbles, null, frameTimeFactor);
     }
 }
