@@ -1,11 +1,9 @@
 package rx.marble;
 
 
-import com.sun.tools.javac.comp.Check;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import rx.functions.Action1;
 import rx.observers.TestSubscriber;
 
 import java.util.concurrent.TimeUnit;
