@@ -1,6 +1,5 @@
 package rx.marble;
 
-import com.sun.media.jfxmediaimpl.MediaDisposer;
 import rx.Notification;
 import rx.Observable;
 import rx.Subscription;
@@ -49,8 +48,7 @@ public class MarbleScheduler extends TestScheduler {
 
     public long createTime(String marbles) {
         int endIndex = marbles.indexOf("|");
-        if (endIndex == -1)
-        {
+        if (endIndex == -1) {
             throw new RuntimeException("Marble diagram for time should have a completion marker '|'");
         }
 
