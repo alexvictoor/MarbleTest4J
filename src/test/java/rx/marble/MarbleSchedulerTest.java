@@ -130,7 +130,7 @@ public class MarbleSchedulerTest {
     }
 
     @Test
-    public void should_demo_with_a_simple_operator() {
+    public void should_compare_streams_with_multiple_events() {
         Observable<String> sourceEvents = scheduler.createColdObservable("a-b-c-|");
         Observable<String> upperEvents = sourceEvents.map(new Func1<String, String>() {
             @Override
@@ -139,6 +139,15 @@ public class MarbleSchedulerTest {
             }
         });
         scheduler.expectObservable(upperEvents).toBe("A-B-C-|");
+    }
+
+    @Test
+    public void should_use_unsubscription_diagram()
+    {
+        Observable<String> source = scheduler.createHotObservable("---^-a-b-|");
+        String unsubscribe =                                         "---!";
+        String expected =                                            "--a";
+        scheduler.expectObservable(source, unsubscribe).toBe(expected);
     }
 
 }

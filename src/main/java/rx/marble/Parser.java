@@ -16,8 +16,7 @@ public class Parser {
                                                                    Map<String, T> values,
                                                                    Exception errorValue,
                                                                    long frameTimeFactor,
-                                                                   boolean materializeInnerObservables)
-    {
+                                                                   boolean materializeInnerObservables) {
 
         if (marbles.indexOf('!') != -1)
         {
@@ -96,4 +95,51 @@ public class Parser {
     public static List<Recorded<Notification<String>>> parseMarbles(String marbles, long frameTimeFactor) {
         return parseMarbles(marbles, null, frameTimeFactor);
     }
+
+    public static SubscriptionLog parseMarblesAsSubscriptions(String marbles, long frameTimeFactor) {
+        int len = marbles.length();
+        long groupStart = -1;
+        long subscriptionFrame = Long.MAX_VALUE;
+        long unsubscriptionFrame = Long.MAX_VALUE;
+
+        for (int i = 0; i < len; i++) {
+            long frame = i * frameTimeFactor;
+            char c = marbles.charAt(i);
+            switch (c) {
+                case '-':
+                case ' ':
+                    break;
+                case '(':
+                    groupStart = frame;
+                    break;
+                case ')':
+                    groupStart = -1;
+                    break;
+                case '^':
+                    if (subscriptionFrame != Long.MAX_VALUE) {
+                        throw new RuntimeException("Found a second subscription point \'^\' in a " +
+                                "subscription marble diagram. There can only be one.");
+                    }
+                    subscriptionFrame = groupStart > -1 ? groupStart : frame;
+                    break;
+                case '!':
+                    if (unsubscriptionFrame != Long.MAX_VALUE) {
+                        throw new RuntimeException("Found a second subscription point \'^\' in a " +
+                                "subscription marble diagram. There can only be one.");
+                    }
+                    unsubscriptionFrame = groupStart > -1 ? groupStart : frame;
+                    break;
+                default:
+                    throw new RuntimeException("There can only be \'^\' and \'!\' markers in a " +
+                            "subscription marble diagram. Found instead \'' + c + '\'.");
+            }
+        }
+
+        if (unsubscriptionFrame < 0) {
+            return new SubscriptionLog(subscriptionFrame);
+        }
+        return new SubscriptionLog(subscriptionFrame, unsubscriptionFrame);
+
+    }
+
 }

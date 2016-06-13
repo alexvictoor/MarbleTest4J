@@ -76,8 +76,8 @@ public class MarbleScheduler extends TestScheduler {
 
         if (unsubscriptionMarbles != null)
         {
-            //unsubscriptionFrame
-            //        = Parser.parseMarblesAsSubscriptions(unsubscriptionMarbles, _frameTimeFactor).Unsubscribe;
+           unsubscriptionFrame
+                    = Parser.parseMarblesAsSubscriptions(unsubscriptionMarbles, frameTimeFactor).unsubscribe;
         }
         final Subscription subscription
                 = observable.subscribe(
@@ -141,7 +141,6 @@ public class MarbleScheduler extends TestScheduler {
     {
         void run();
         boolean isReady();
-        void flagAsReady();
     }
 
     class FlushableTest implements ITestOnFlush {
@@ -186,11 +185,6 @@ public class MarbleScheduler extends TestScheduler {
         @Override
         public boolean isReady() {
             return ready;
-        }
-
-        @Override
-        public void flagAsReady() {
-            ready = true;
         }
 
     }

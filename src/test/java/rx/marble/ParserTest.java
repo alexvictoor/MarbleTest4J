@@ -125,6 +125,28 @@ public class ParserTest {
         );
     }
 
+    @Test
+    public void should_parse_a_subscription_marble_string_into_a_subscriptionLog()
+    {
+        SubscriptionLog result = Parser.parseMarblesAsSubscriptions("---^---!-", 10);
 
+        assertThat(result.subscribe).isEqualTo(30);
+        assertThat(result.unsubscribe).isEqualTo(70);
+    }
 
+    @Test
+    public void should_parse_a_subscription_marble_without_an_unsubscription() {
+        SubscriptionLog result = Parser.parseMarblesAsSubscriptions("---^---", 10);
+
+        assertThat(result.subscribe).isEqualTo(30);
+        assertThat(result.unsubscribe).isEqualTo(Long.MAX_VALUE);
+    }
+
+    @Test
+    public void should_parse_a_subscription_marble_with_a_synchronous_unsubscription() {
+        SubscriptionLog result = Parser.parseMarblesAsSubscriptions("---(^!)---", 10);
+
+        assertThat(result.subscribe).isEqualTo(30);
+        assertThat(result.unsubscribe).isEqualTo(30);
+    }
 }
