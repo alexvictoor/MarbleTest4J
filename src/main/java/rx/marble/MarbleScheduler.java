@@ -119,6 +119,13 @@ public class MarbleScheduler extends TestScheduler {
         return new SetupTest(flushTest, frameTimeFactor);
     }
 
+    public ISetupSubscriptionsTest expectSubscriptions(List<SubscriptionLog> subscriptions) {
+        FlushableSubscriptionTest flushTest = new FlushableSubscriptionTest();
+        flushTest.actual = subscriptions;
+        flushTests.add(flushTest);
+        return new SetupSubscriptionsTest(flushTest, frameTimeFactor);
+    }
+
     class SetupTest extends SetupTestSupport
     {
         private final FlushableTest flushTest;
@@ -187,5 +194,52 @@ public class MarbleScheduler extends TestScheduler {
             return ready;
         }
 
+    }
+
+    class SetupSubscriptionsTest implements ISetupSubscriptionsTest
+    {
+        private final FlushableSubscriptionTest flushTest;
+        private final long frameTimeFactor;
+
+        public SetupSubscriptionsTest(FlushableSubscriptionTest flushTest, long frameTimeFactor) {
+            this.flushTest = flushTest;
+            this.frameTimeFactor = frameTimeFactor;
+        }
+
+        public void toBe(String... marbles) {
+            flushTest.ready = true;
+            flushTest.expected = new ArrayList<>();
+            for (String marble : marbles) {
+                SubscriptionLog subscriptionLog = Parser.parseMarblesAsSubscriptions(marble, frameTimeFactor);
+                flushTest.expected.add(subscriptionLog);
+            }
+        }
+    }
+
+    class FlushableSubscriptionTest implements ITestOnFlush {
+        private  boolean ready;
+        public List<SubscriptionLog> actual;
+        public List<SubscriptionLog> expected;
+
+        public void run() {
+            if (actual.size() != expected.size()) {
+                throw new RuntimeException(
+                        expected.size() + " subscription(s) expected, only " + actual.size() + " observed"
+                );
+            }
+            for (int i = 0; i < actual.size(); i++) {
+                if ((actual.get(i) != null && !actual.get(i).equals(expected.get(i)))
+                    || (actual.get(i) == null && expected.get(i) != null)) {
+                    throw new RuntimeException(
+                        "Expected subscription was " + expected.get(i) + ", instead received " + actual.get(i)
+                    );
+                }
+            }
+        }
+
+        @Override
+        public boolean isReady() {
+            return ready;
+        }
     }
 }
