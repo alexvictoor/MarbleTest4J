@@ -86,10 +86,9 @@ public class MarbleScheduler extends TestScheduler {
                     public void call(T x) {
                         Object value = x;
                         // Support Observable-of-Observables
-                        /*if (value is IObservable<object>)
-                        {
-                            value = MaterializeInnerObservable(value as IObservable<object>, Clock);
-                        }*/
+                        if (value instanceof Observable) {
+                            value = materializeInnerObservable((Observable)value, now());
+                        }
                         actual.add(new Recorded<>(now(), Notification.createOnNext(value)));
                     }
                 },
@@ -117,6 +116,29 @@ public class MarbleScheduler extends TestScheduler {
         flushTests.add(flushTest);
 
         return new SetupTest(flushTest, frameTimeFactor);
+    }
+
+    private List<Recorded<Notification<Object>>> materializeInnerObservable(final Observable observable, final long outerFrame) {
+        final List<Recorded<Notification<Object>>> messages = new ArrayList<>();
+        observable.subscribe(
+                new Action1() {
+                    @Override
+                    public void call(Object x) {
+                        messages.add(new Recorded<>(now() - outerFrame, Notification.createOnNext(x)));
+                    }
+                }, new Action1<Throwable>() {
+                    @Override
+                    public void call(Throwable throwable) {
+                        messages.add(new Recorded<>(now() - outerFrame, Notification.createOnError(throwable)));
+                    }
+                }, new Action0() {
+                    @Override
+                    public void call() {
+                        messages.add(new Recorded<>(now() - outerFrame, Notification.createOnCompleted()));
+                    }
+                });
+
+        return messages;
     }
 
     public ISetupSubscriptionsTest expectSubscriptions(List<SubscriptionLog> subscriptions) {

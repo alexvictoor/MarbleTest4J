@@ -158,4 +158,36 @@ public class MarbleSchedulerTest {
         source.subscribe();
     }
 
+    @Test
+    public void should_support_testing_metastreams()
+    {
+        ColdObservable<String> x = scheduler.createColdObservable("-a-b|");
+        ColdObservable<String> y = scheduler.createColdObservable("-c-d|");
+        Observable<ColdObservable<String>> myObservable
+                = scheduler.createHotObservable("---x---y----|", of("x", x, "y", y));
+        String expected = "---x---y----|";
+        Object expectedx = scheduler.createColdObservable("-a-b|");
+        Object expectedy = scheduler.createColdObservable("-c-d|");
+        scheduler.expectObservable(myObservable).toBe(expected, of("x", expectedx, "y", expectedy));
+    }
+
+    @Test
+    public void should_demo_metastreams_with_windows()
+    {
+        String input   =                                "a---b---c---d-|";
+        Observable<String> myObservable = scheduler.createColdObservable(input);
+
+        Observable<?> result = myObservable.window(2, 1);
+
+        Object aWindow = scheduler.createColdObservable("a---(b|)");
+        Object bWindow = scheduler.createColdObservable(    "b---(c|)");
+        Object cWindow = scheduler.createColdObservable(        "c---(d|)");
+        Object dWindow = scheduler.createColdObservable(            "d-|");
+
+        String expected = "a---b---c---d-|";
+        scheduler
+                .expectObservable(result)
+                .toBe(expected, of("a", aWindow, "b", bWindow, "c", cWindow, "d", dWindow));
+    }
+
 }

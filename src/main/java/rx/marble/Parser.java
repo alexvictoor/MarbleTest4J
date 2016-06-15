@@ -63,12 +63,9 @@ public class Parser {
                     else
                     {
                         value = values.get(String.valueOf(c));
-                        if (materializeInnerObservables)
+                        if (materializeInnerObservables && value instanceof ColdObservable)
                         {
-                            /*if ((typeof(T) == typeof(object)) && ReflectionHelper.IsTestableObservable(value))
-                            {
-                                value = (T) ReflectionHelper.RetrieveNotificationsFromTestableObservable(value);
-                            }*/
+                            value = (T)((ColdObservable)value).getMessages();
                         }
                     }
                     notification = Notification.createOnNext(value);

@@ -4,15 +4,14 @@ package rx.marble;
 import org.junit.Test;
 import rx.Notification;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-/**
- * Created by Alexandre Victoor on 05/06/2016.
- */
+
 public class ParserTest {
 
     @Test
@@ -148,5 +147,26 @@ public class ParserTest {
 
         assertThat(result.subscribe).isEqualTo(30);
         assertThat(result.unsubscribe).isEqualTo(30);
+    }
+
+    @Test
+    public void should_parse_a_marble_string_with_observable_values()
+    {
+
+        ColdObservable<Integer> aObservable
+                = ColdObservable.create(null, new Recorded<>(20, Notification.createOnNext(123)));
+        Map<String, Object> events = new HashMap<>();
+        events.put("a", aObservable);
+        List<Recorded<Notification<Object>>> result = Parser.parseMarbles("-a-", events, null, 10, true);
+
+        assertThat(result).containsExactly(
+                new Recorded<>(10,
+                        Notification.createOnNext(
+                                (Object)Arrays.asList(
+                                        new Recorded<>(20, Notification.createOnNext(123))
+                                )
+                        )
+                )
+        );
     }
 }
