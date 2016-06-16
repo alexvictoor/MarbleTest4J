@@ -75,8 +75,7 @@ public class MarbleScheduler extends TestScheduler {
         flushTest.actual = actual;
         long unsubscriptionFrame = Long.MAX_VALUE;
 
-        if (unsubscriptionMarbles != null)
-        {
+        if (unsubscriptionMarbles != null) {
            unsubscriptionFrame
                     = Parser.parseMarblesAsSubscriptions(unsubscriptionMarbles, frameTimeFactor).unsubscribe;
         }
@@ -149,19 +148,16 @@ public class MarbleScheduler extends TestScheduler {
         return new SetupSubscriptionsTest(flushTest, frameTimeFactor);
     }
 
-    class SetupTest extends SetupTestSupport
-    {
+    class SetupTest extends SetupTestSupport {
         private final FlushableTest flushTest;
         private final long frameTimeFactor;
 
-        public SetupTest(FlushableTest flushTest, long frameTimeFactor)
-        {
+        public SetupTest(FlushableTest flushTest, long frameTimeFactor) {
             this.flushTest = flushTest;
             this.frameTimeFactor = frameTimeFactor;
         }
 
-        public void toBe(String marble, Map<String, ?> values, Exception errorValue)
-        {
+        public void toBe(String marble, Map<String, ?> values, Exception errorValue) {
             flushTest.ready = true;
             if (values == null) {
                 flushTest.expected = Parser.parseMarbles(marble, null, errorValue, frameTimeFactor, true);
@@ -171,8 +167,7 @@ public class MarbleScheduler extends TestScheduler {
         }
     }
 
-    interface ITestOnFlush
-    {
+    interface ITestOnFlush {
         void run();
         boolean isReady();
     }
@@ -223,8 +218,7 @@ public class MarbleScheduler extends TestScheduler {
 
     }
 
-    class SetupSubscriptionsTest implements ISetupSubscriptionsTest
-    {
+    class SetupSubscriptionsTest implements ISetupSubscriptionsTest {
         private final FlushableSubscriptionTest flushTest;
         private final long frameTimeFactor;
 

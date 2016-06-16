@@ -143,8 +143,7 @@ public class MarbleSchedulerTest {
     }
 
     @Test
-    public void should_use_unsubscription_diagram()
-    {
+    public void should_use_unsubscription_diagram() {
         Observable<String> source = scheduler.createHotObservable("---^-a-b-|");
         String unsubscribe =                                         "---!";
         String expected =                                            "--a";
@@ -163,8 +162,8 @@ public class MarbleSchedulerTest {
     public void should_be_awesome() {
         Map<String, ?> values = of("a", 1, "b", 2);
         ColdObservable<?> myObservable
-                = scheduler.createColdObservable("---a---b--|", values);
-        String subs =                            "^---------!";
+                = scheduler.createColdObservable(     "---a---b--|", values);
+        String subs =                                 "^---------!";
         scheduler.expectObservable(myObservable).toBe("---a---b--|", values);
         scheduler.expectSubscriptions(myObservable.subscriptions).toBe(subs);
     }
@@ -183,8 +182,7 @@ public class MarbleSchedulerTest {
     }
 
     @Test
-    public void should_demo_metastreams_with_windows()
-    {
+    public void should_demo_metastreams_with_windows() {
         String input   =                                "a---b---c---d-|";
         Observable<String> myObservable = scheduler.createColdObservable(input);
 

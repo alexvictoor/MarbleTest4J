@@ -18,8 +18,7 @@ public class Parser {
                                                                    long frameTimeFactor,
                                                                    boolean materializeInnerObservables) {
 
-        if (marbles.indexOf('!') != -1)
-        {
+        if (marbles.indexOf('!') != -1) {
             throw new RuntimeException("Conventional marble diagrams cannot have the unsubscription marker '!'");
         }
 
@@ -30,13 +29,11 @@ public class Parser {
 
         long groupStart = -1;
 
-        for (int i = 0; i < len; i++)
-        {
+        for (int i = 0; i < len; i++) {
             long frame = i * frameTimeFactor + frameOffset;
             Notification<T> notification = null;
             char c = marbles.charAt(i);
-            switch (c)
-            {
+            switch (c) {
                 case '-':
                 case ' ':
                     break;
@@ -56,15 +53,11 @@ public class Parser {
                     break;
                 default:
                     T value;
-                    if (values == null)
-                    {
+                    if (values == null) {
                         value = (T)String.valueOf(c);
-                    }
-                    else
-                    {
+                    } else {
                         value = values.get(String.valueOf(c));
-                        if (materializeInnerObservables && value instanceof ColdObservable)
-                        {
+                        if (materializeInnerObservables && value instanceof ColdObservable) {
                             value = (T)((ColdObservable)value).getMessages();
                         }
                     }
@@ -72,8 +65,7 @@ public class Parser {
                     break;
             }
 
-            if (notification != null)
-            {
+            if (notification != null) {
                 long messageFrame = groupStart > -1 ? groupStart : frame;
                 testMessages.add(new Recorded<>(messageFrame, notification));
             }
