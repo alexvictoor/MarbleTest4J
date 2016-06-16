@@ -11,9 +11,7 @@ import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-/**
- * Created by Alexandre Victoor on 10/06/2016.
- */
+
 public class HotObservableTest {
 
     @Test
