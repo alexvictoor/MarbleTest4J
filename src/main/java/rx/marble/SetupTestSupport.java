@@ -6,7 +6,7 @@ import java.util.Map;
 public abstract class SetupTestSupport implements ISetupTest {
 
     public void toBe(String marble,
-              Map<String, Object> values) {
+              Map<String, ?> values) {
 
         toBe(marble, values, null);
     }

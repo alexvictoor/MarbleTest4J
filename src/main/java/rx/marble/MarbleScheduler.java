@@ -8,6 +8,7 @@ import rx.functions.Action1;
 import rx.schedulers.TestScheduler;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -159,10 +160,14 @@ public class MarbleScheduler extends TestScheduler {
             this.frameTimeFactor = frameTimeFactor;
         }
 
-        public void toBe(String marble, Map<String, Object> values, Exception errorValue)
+        public void toBe(String marble, Map<String, ?> values, Exception errorValue)
         {
             flushTest.ready = true;
-            flushTest.expected = Parser.parseMarbles(marble, values, errorValue, frameTimeFactor, true);
+            if (values == null) {
+                flushTest.expected = Parser.parseMarbles(marble, null, errorValue, frameTimeFactor, true);
+            } else {
+                flushTest.expected = Parser.parseMarbles(marble, new HashMap<>(values), errorValue, frameTimeFactor, true);
+            }
         }
     }
 

@@ -10,6 +10,7 @@ import rx.functions.Func1;
 import rx.observers.TestSubscriber;
 
 import java.util.Collections;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -156,6 +157,16 @@ public class MarbleSchedulerTest {
         String subs =                                                  "^--------!";
         scheduler.expectSubscriptions(source.subscriptions).toBe(subs);
         source.subscribe();
+    }
+
+    @Test
+    public void should_be_awesome() {
+        Map<String, ?> values = of("a", 1, "b", 2);
+        ColdObservable<?> myObservable
+                = scheduler.createColdObservable("---a---b--|", values);
+        String subs =                            "^---------!";
+        scheduler.expectObservable(myObservable).toBe("---a---b--|", values);
+        scheduler.expectSubscriptions(myObservable.subscriptions).toBe(subs);
     }
 
     @Test
