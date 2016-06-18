@@ -154,7 +154,7 @@ public class MarbleSchedulerTest {
     public void should_assert_subscriptions_of_a_cold_observable() {
         ColdObservable<String> source = scheduler.createColdObservable("---a---b-|");
         String subs =                                                  "^--------!";
-        scheduler.expectSubscriptions(source.subscriptions).toBe(subs);
+        scheduler.expectSubscriptions(source.getSubscriptions()).toBe(subs);
         source.subscribe();
     }
 
@@ -165,7 +165,7 @@ public class MarbleSchedulerTest {
                 = scheduler.createColdObservable(     "---a---b--|", values);
         String subs =                                 "^---------!";
         scheduler.expectObservable(myObservable).toBe("---a---b--|", values);
-        scheduler.expectSubscriptions(myObservable.subscriptions).toBe(subs);
+        scheduler.expectSubscriptions(myObservable.getSubscriptions()).toBe(subs);
     }
 
     @Test

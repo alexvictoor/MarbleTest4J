@@ -17,7 +17,7 @@ import java.util.concurrent.TimeUnit;
 public class ColdObservable<T> extends Observable<T> implements TestableObservable<T> {
 
     private final List<Recorded<Notification<T>>> notifications;
-    List<SubscriptionLog> subscriptions = new ArrayList<>();
+    private List<SubscriptionLog> subscriptions = new ArrayList<>();
 
     private ColdObservable(OnSubscribe<T> f, List<Recorded<Notification<T>>> notifications) {
         super(f);
