@@ -9,6 +9,8 @@ import rx.functions.Action0;
 import rx.functions.Func1;
 import rx.observers.TestSubscriber;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -197,6 +199,46 @@ public class MarbleSchedulerTest {
         scheduler
                 .expectObservable(result)
                 .toBe(expected, of("a", aWindow, "b", bWindow, "c", cWindow, "d", dWindow));
+    }
+
+    @Test
+    public void should_indicate_failed_assertion_with_unexpected_observable() {
+        MarbleScheduler scheduler = new MarbleScheduler();
+        scheduler.expectObservable(Observable.just("hello")).toBe("--h|");
+        try {
+            scheduler.flush();
+        } catch(ExpectObservableException ex) {
+            assertThat(ex.getMessage()).contains("from assertion at " + getClass().getCanonicalName());
+        }
+    }
+
+    @Test
+    public void should_indicate_failed_assertion_when_no_expected_subscription() {
+        MarbleScheduler scheduler = new MarbleScheduler();
+        ColdObservable<?> myObservable
+                = scheduler.createColdObservable(     "---a---b--|");
+        String subs =                                 "^---------!";
+        scheduler.expectSubscriptions(myObservable.getSubscriptions()).toBe(subs);
+        try {
+            scheduler.flush();
+        } catch(ExpectSubscriptionsException ex) {
+            assertThat(ex.getMessage()).contains("from assertion at " + getClass().getCanonicalName());
+        }
+    }
+
+    @Test
+    public void should_indicate_failed_assertion_with_unexpected_subscription() {
+        MarbleScheduler scheduler = new MarbleScheduler();
+        ColdObservable<?> myObservable
+                = scheduler.createColdObservable(     "---a---b--|");
+        String subs =                                 "^-----------!";
+        scheduler.expectObservable(myObservable).toBe("---a---b--|");
+        scheduler.expectSubscriptions(myObservable.getSubscriptions()).toBe(subs);
+        try {
+            scheduler.flush();
+        } catch(ExpectSubscriptionsException ex) {
+            assertThat(ex.getMessage()).contains("from assertion at " + getClass().getCanonicalName());
+        }
     }
 
 }
