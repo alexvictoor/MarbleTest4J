@@ -58,4 +58,12 @@ public class DemoTest {
         expectSubscriptions(myObservable.getSubscriptions()).toBe(subs);
     }
 
+    @Test
+    public void should_use_unsubscription_diagram() {
+        Observable<String> source = hot("---^-a-b-|");
+        String unsubscribe =               "---!";
+        String expected =                  "--a";
+        expectObservable(source, unsubscribe).toBe(expected);
+    }
+
 }
