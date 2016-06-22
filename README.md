@@ -22,8 +22,8 @@ To get the lib just use add a maven dependency as below:
 ## Usage (the concise way)
 A jUnit integration is provided in order to let you write concise tests as you would have done with RxJS.
 This integration is made of a jUnit rule **MarbleRule** and a bunch of static methods providing aliases to MarbleScheduler's methods. 
-**MarbleScheduler** is very similar to RxJS TestScheduler, i.e. it is like RxJava's TestScheduler plus marble related methods to create hot & cold 
-test observables and then perform assertions, still using marble schemas in ASCII form.   
+**MarbleScheduler** is very similar to RxJS TestScheduler: it is like RxJava's TestScheduler plus marble related methods to create hot & cold 
+test observables and then perform assertions. Obviously everything is done using marble schemas in ASCII form.     
 **MarbleRule** keeps in a threadlocal reference a **MarbleScheduler** instance that will be used by static aliases methods. 
 Though, for most cases you will not need to manipulate directly any scheduler.   
 Below a complete example:
@@ -45,7 +45,7 @@ public void should_map() {
 ```
 In the example above, we create first a hot observable trigering events 'a', 'b', 'c', 'd' (at 0, 20, 40 and 60)  
 Then we perform some transformations, using rx map operator, and last we perform an assertion on generated Observable.  
-In this example event values are strings, other types are also supported:
+In previous example event values were strings, other types are also supported:
 ```
 import static rx.marble.junit.MarbleRule.*;
 import static rx.marble.MapHelper.of;
@@ -65,13 +65,12 @@ public void should_subscribe_during_the_test() {
     expectSubscriptions(myObservable.getSubscriptions()).toBe(subs);
 }
 ```
-As shown above, you can check events timing and values, but also subscription start and end.  
+As shown above, you can check events timing and values, but also when subscriptions start and end.  
 Everything in a visual way using marble diagrams in ASCII forms :-)
 
 ## Usage (the verbose way)
 
-The API sticks to the RxJS one. The main difference is that instead of using a good old TestScheduler, you will need a **MarbleScheduler**. 
-If you are already familiar with the API provided by RxJS you can skip this section and go to the next one. Otherwise here is how to initiate a scheduler: 
+As said before, the API sticks to the RxJS one. The cornerstone of this API is the **MArbleScheduler** class. Below an example showing how to initiate a scheduler: 
 ```
 MarbleScheduler scheduler = new MarbleScheduler();
 ``` 
