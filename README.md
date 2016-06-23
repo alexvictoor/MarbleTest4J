@@ -38,7 +38,7 @@ public void should_map() {
     // given
     Observable<String> input = hot("a-b--c---d");
     // when
-    Observable<String> output = input.map((s) -> s.toUpperCase());
+    Observable<String> output = input.map(s -> s.toUpperCase());
     // then
     expectObservable(output).toBe( "A-B--C---D");
 }
