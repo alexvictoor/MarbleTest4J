@@ -36,14 +36,14 @@ public MarbleRule marble = new MarbleRule();
 @Test
 public void should_map() {
     // given
-    Observable<String> input = hot("a-b-c-d");
+    Observable<String> input = hot("a-b--c---d");
     // when
     Observable<String> output = input.map((s) -> s.toUpperCase());
     // then
-    expectObservable(output).toBe("A-B-C-D");
+    expectObservable(output).toBe( "A-B--C---D");
 }
 ```
-In the example above, we create first a hot observable trigering events 'a', 'b', 'c', 'd' (at 0, 20, 40 and 60)  
+In the example above, we create first a hot observable trigering events 'a', 'b', 'c', 'd' (at 0, 20, 50 and 90)  
 Then we perform some transformations, using rx map operator, and last we perform an assertion on generated Observable.  
 In previous example event values were strings, other types are also supported:
 ```
@@ -55,14 +55,14 @@ public MarbleRule marble = new MarbleRule();
 
 @Test
 public void should_subscribe_during_the_test() {
-    Map<String, Integer> values = of("a", 1, "b", 2); // shortcut to create a Map
+    Map<String, Integer> values = of("a", 1, "b", 2); // shortcut from class MapHelper to create a Map
     
     ColdObservable<Integer> myObservable
                 = cold(                 "---a---b--|", values);
-    String subs =                       "^---------!";
+    String subscription =               "^---------!";
     
     expectObservable(myObservable).toBe("---a---b--|", values);
-    expectSubscriptions(myObservable.getSubscriptions()).toBe(subs);
+    expectSubscriptions(myObservable.getSubscriptions()).toBe(subscription);
 }
 ```
 As shown above, you can check events timing and values, but also when subscriptions start and end.  
