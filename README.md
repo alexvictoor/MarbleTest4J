@@ -6,7 +6,8 @@ Java port of RxJS marble tests
 MarbleTest4j is a tiny library that allows to write tests for codes based on RxJava using marble diagrams in ASCII form.  
 This is a Java port of the [marble test features](https://github.com/ReactiveX/rxjs/blob/master/doc/writing-marble-tests.md) of amazing RxJS v5.  
 The purpose of the library is to help you write as concise an readable tests when dealing with Rx code, 
-bringing a developer experience as close as possible as the one of RxJS. 
+bringing a developer experience as close as possible as the one of RxJS.  
+Check out this nice [7 minutes introduction on egghead.io](https://egghead.io/lessons/rxjs-introduction-to-rxjs-marble-testing) to get up to speed with RxJS marble testing.  
 
 ## Quickstart
 
