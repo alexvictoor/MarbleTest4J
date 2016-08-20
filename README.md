@@ -70,7 +70,7 @@ Everything in a visual way using marble diagrams in ASCII forms :-)
 
 ## Usage (the verbose way)
 
-As said before, the API sticks to the RxJS one. The cornerstone of this API is the **MArbleScheduler** class. Below an example showing how to initiate a scheduler: 
+As said before, the API sticks to the RxJS one. The cornerstone of this API is the **MarbleScheduler** class. Below an example showing how to initiate a scheduler: 
 ```
 MarbleScheduler scheduler = new MarbleScheduler();
 ``` 
