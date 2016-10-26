@@ -7,6 +7,6 @@ interface TestableObservable<T> {
 
     List<SubscriptionLog> getSubscriptions();
 
-    List<Recorded<Notification<T>>> getMessages();
+    List<Recorded<T>> getMessages();
 }
 

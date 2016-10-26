@@ -19,7 +19,7 @@ public class ColdObservableTest {
     public void should_send_notification_on_subscribe() {
         // given
         TestScheduler scheduler = new TestScheduler();
-        Recorded<Notification<String>> event = new Recorded<>(0, Notification.createOnNext("Hello world!"));
+        Recorded<String> event = new Recorded<>(0, Notification.createOnNext("Hello world!"));
         ColdObservable<String> coldObservable = ColdObservable.create(scheduler, event);
         // when
         TestSubscriber<String> subscriber = new TestSubscriber<>();
@@ -34,7 +34,7 @@ public class ColdObservableTest {
         // given
         TestScheduler scheduler = new TestScheduler();
         long offset = 10;
-        Recorded<Notification<String>> event = new Recorded<>(offset, Notification.createOnNext("Hello world!"));
+        Recorded<String> event = new Recorded<>(offset, Notification.createOnNext("Hello world!"));
         ColdObservable<String> coldObservable = ColdObservable.create(scheduler, event);
         // when
         TestSubscriber<String> subscriber = new TestSubscriber<>();
@@ -51,7 +51,7 @@ public class ColdObservableTest {
         // given
         TestScheduler scheduler = new TestScheduler();
         long offset = 10;
-        Recorded<Notification<String>> event = new Recorded<>(offset, Notification.createOnNext("Hello world!"));
+        Recorded<String> event = new Recorded<>(offset, Notification.createOnNext("Hello world!"));
         ColdObservable<String> coldObservable = ColdObservable.create(scheduler, event);
         TestSubscriber<String> subscriber = new TestSubscriber<>();
         final Subscription subscription = coldObservable.subscribe(subscriber);
@@ -71,7 +71,7 @@ public class ColdObservableTest {
     public void should_be_cold_and_send_notification_at_subscribe_time() {
         // given
         TestScheduler scheduler = new TestScheduler();
-        Recorded<Notification<String>> event = new Recorded<>(0, Notification.createOnNext("Hello world!"));
+        Recorded<String> event = new Recorded<>(0, Notification.createOnNext("Hello world!"));
         final ColdObservable<String> coldObservable = ColdObservable.create(scheduler, event);
         // when
         final TestSubscriber<String> subscriber = new TestSubscriber<>();

@@ -12,7 +12,7 @@ import java.util.Map;
 public class Parser {
 
 
-    public static <T> List<Recorded<Notification<T>>> parseMarbles(String marbles,
+    public static <T> List<Recorded<T>> parseMarbles(String marbles,
                                                                    Map<String, T> values,
                                                                    Exception errorValue,
                                                                    long frameTimeFactor,
@@ -23,7 +23,7 @@ public class Parser {
         }
 
         int len = marbles.length();
-        List<Recorded<Notification<T>>> testMessages = new ArrayList<>();
+        List<Recorded<T>> testMessages = new ArrayList<>();
         int subIndex = marbles.indexOf('^');
         long frameOffset = subIndex == -1 ? 0 : (subIndex * -frameTimeFactor);
 
@@ -73,15 +73,15 @@ public class Parser {
         return testMessages;
     }
 
-    public static <T> List<Recorded<Notification<T>>> parseMarbles(String marbles, Map<String, T> values, long frameTimeFactor) {
+    public static <T> List<Recorded<T>> parseMarbles(String marbles, Map<String, T> values, long frameTimeFactor) {
         return parseMarbles(marbles, values, null, frameTimeFactor);
     }
 
-    public static <T> List<Recorded<Notification<T>>> parseMarbles(String marbles, Map<String, T> values, Exception errorValue, long frameTimeFactor) {
+    public static <T> List<Recorded<T>> parseMarbles(String marbles, Map<String, T> values, Exception errorValue, long frameTimeFactor) {
         return parseMarbles(marbles, values, errorValue, frameTimeFactor, false);
     }
 
-    public static List<Recorded<Notification<String>>> parseMarbles(String marbles, long frameTimeFactor) {
+    public static List<Recorded<String>> parseMarbles(String marbles, long frameTimeFactor) {
         return parseMarbles(marbles, null, frameTimeFactor);
     }
 

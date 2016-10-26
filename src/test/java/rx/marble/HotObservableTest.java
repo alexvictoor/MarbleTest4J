@@ -18,7 +18,7 @@ public class HotObservableTest {
     public void should_send_notification_occurring_after_subscribe() {
         // given
         TestScheduler scheduler = new TestScheduler();
-        Recorded<Notification<String>> event = new Recorded<>(10, Notification.createOnNext("Hello world!"));
+        Recorded<String> event = new Recorded<>(10, Notification.createOnNext("Hello world!"));
         HotObservable<String> hotObservable = HotObservable.create(scheduler, event);
         // when
         TestSubscriber<String> subscriber = new TestSubscriber<>();
@@ -32,7 +32,7 @@ public class HotObservableTest {
     public void should_not_send_notification_occurring_before_subscribe() {
         // given
         TestScheduler scheduler = new TestScheduler();
-        Recorded<Notification<String>> event = new Recorded<>(10, Notification.createOnNext("Hello world!"));
+        Recorded<String> event = new Recorded<>(10, Notification.createOnNext("Hello world!"));
         final HotObservable<String> hotObservable = HotObservable.create(scheduler, event);
         // when
         final TestSubscriber<String> subscriber = new TestSubscriber<>();
@@ -51,7 +51,7 @@ public class HotObservableTest {
     public void should_not_send_notification_occurring_after_unsubscribe() {
         // given
         TestScheduler scheduler = new TestScheduler();
-        Recorded<Notification<String>> event = new Recorded<>(10, Notification.createOnNext("Hello world!"));
+        Recorded<String> event = new Recorded<>(10, Notification.createOnNext("Hello world!"));
         final HotObservable<String> hotObservable = HotObservable.create(scheduler, event);
         // when
         final TestSubscriber<String> subscriber = new TestSubscriber<>();

@@ -5,7 +5,7 @@
 	<groupId>com.github.alexvictoor</groupId>
 	<artifactId>marbletest4j</artifactId>
 	<name>marbletest4j</name>
-	<version>1.0-SNAPSHOT</version>
+	<version>1.1-SNAPSHOT</version>
     <url>https://github.com/alexvictoor/marbletest4j</url>
     <description>Java port of RxJS marble tests</description>
 
@@ -59,7 +59,7 @@
         <dependency>
             <groupId>io.reactivex</groupId>
             <artifactId>rxjava</artifactId>
-            <version>1.1.6</version>
+            <version>1.2.1</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>

@@ -1,14 +1,16 @@
 package rx.marble;
 
+import rx.Notification;
+
 /**
  * Created by Alexandre Victoor on 05/06/2016.
  */
 public class Recorded<T> {
 
-    public final T value;
+    public final Notification<T> value;
     public final long time;
 
-    public Recorded(long time, T value) {
+    public Recorded(long time, Notification<T> value) {
         this.time = time;
         this.value = value;
     }
@@ -16,10 +18,24 @@ public class Recorded<T> {
 
     @Override
     public String toString() {
-        return "Recorded{" +
-                "value=" + value +
-                ", time=" + time +
-                '}';
+
+        final String valueString;
+        switch (value.getKind()) {
+            case OnCompleted:
+                valueString = "On Completed";
+                break;
+            case OnError:
+                valueString =  "On Error";
+                break;
+            default:
+                valueString = "On Next: " + value.getValue();
+        }
+
+
+        return "{\n" +
+                "  time = " + time +
+                "\n  " + valueString +
+                "\n}";
     }
 
     @Override

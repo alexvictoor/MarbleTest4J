@@ -16,10 +16,10 @@ import java.util.concurrent.TimeUnit;
 
 public class HotObservable<T> extends Observable<T> implements TestableObservable<T> {
 
-    private final List<Recorded<Notification<T>>> notifications;
+    private final List<Recorded<T>> notifications;
     List<SubscriptionLog> subscriptions = new ArrayList<>();
 
-    protected HotObservable(OnSubscribe<T> f, List<Recorded<Notification<T>>> notifications) {
+    protected HotObservable(OnSubscribe<T> f, List<Recorded<T>> notifications) {
         super(f);
         this.notifications = notifications;
     }
@@ -30,15 +30,15 @@ public class HotObservable<T> extends Observable<T> implements TestableObservabl
     }
 
     @Override
-    public List<Recorded<Notification<T>>> getMessages() {
+    public List<Recorded<T>> getMessages() {
         return Collections.unmodifiableList(notifications);
     }
 
-    public static <T> HotObservable<T> create(Scheduler scheduler, Recorded<Notification<T>>... notifications) {
+    public static <T> HotObservable<T> create(Scheduler scheduler, Recorded<T>... notifications) {
         return create(scheduler, Arrays.asList(notifications));
     }
 
-    public static <T> HotObservable<T> create(Scheduler scheduler, List<Recorded<Notification<T>>> notifications) {
+    public static <T> HotObservable<T> create(Scheduler scheduler, List<Recorded<T>> notifications) {
         OnSubscribeHandler<T> onSubscribeFunc = new OnSubscribeHandler<>(scheduler, notifications);
         HotObservable<T> observable = new HotObservable<>(onSubscribeFunc, notifications);
         onSubscribeFunc.observable = observable;
@@ -51,10 +51,10 @@ public class HotObservable<T> extends Observable<T> implements TestableObservabl
         private final List<Subscriber<? super T>> subscribers = new ArrayList<>();
         public HotObservable<T> observable;
 
-        public OnSubscribeHandler(Scheduler scheduler, List<Recorded<Notification<T>>> notifications) {
+        public OnSubscribeHandler(Scheduler scheduler, List<Recorded<T>> notifications) {
             this.scheduler = scheduler;
             Scheduler.Worker worker = scheduler.createWorker();
-            for (final Recorded<Notification<T>> event : notifications) {
+            for (final Recorded<T> event : notifications) {
                 worker.schedule(new Action0() {
                     @Override
                     public void call() {

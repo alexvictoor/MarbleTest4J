@@ -29,7 +29,7 @@ public class MarbleScheduler extends TestScheduler {
     }
 
     public <T> ColdObservable<T> createColdObservable(String marbles, Map<String, T> values) {
-        List<Recorded<Notification<T>>> notifications = Parser.parseMarbles(marbles, values, null, frameTimeFactor);
+        List<Recorded<T>> notifications = Parser.parseMarbles(marbles, values, null, frameTimeFactor);
         return ColdObservable.create(this, notifications);
     }
 
@@ -38,7 +38,7 @@ public class MarbleScheduler extends TestScheduler {
     }
 
     public <T> HotObservable<T> createHotObservable(String marbles, Map<String, T> values) {
-        List<Recorded<Notification<T>>> notifications = Parser.parseMarbles(marbles, values, null, frameTimeFactor);
+        List<Recorded<T>> notifications = Parser.parseMarbles(marbles, values, null, frameTimeFactor);
         return HotObservable.create(this, notifications);
     }
 
@@ -72,7 +72,7 @@ public class MarbleScheduler extends TestScheduler {
     public <T> ISetupTest expectObservable(Observable<T> observable, String unsubscriptionMarbles) {
         String caller = ExceptionHelper.findCallerInStackTrace(getClass());
         FlushableTest flushTest = new FlushableTest(caller);
-        final List<Recorded<Notification<Object>>> actual = new ArrayList<>();
+        final List<Recorded<Object>> actual = new ArrayList<>();
         flushTest.actual = actual;
         long unsubscriptionFrame = Long.MAX_VALUE;
 
@@ -119,8 +119,8 @@ public class MarbleScheduler extends TestScheduler {
         return new SetupTest(flushTest, frameTimeFactor);
     }
 
-    private List<Recorded<Notification<Object>>> materializeInnerObservable(final Observable observable, final long outerFrame) {
-        final List<Recorded<Notification<Object>>> messages = new ArrayList<>();
+    private List<Recorded<Object>> materializeInnerObservable(final Observable observable, final long outerFrame) {
+        final List<Recorded<Object>> messages = new ArrayList<>();
         observable.subscribe(
                 new Action1() {
                     @Override
@@ -177,14 +177,22 @@ public class MarbleScheduler extends TestScheduler {
     class FlushableTest implements ITestOnFlush {
         private final String caller;
         private boolean ready;
-        public List<Recorded<Notification<Object>>> actual;
-        public List<Recorded<Notification<Object>>> expected;
+        public List<Recorded<Object>> actual;
+        public List<Recorded<Object>> expected;
 
         public FlushableTest(String caller) {
             this.caller = caller;
         }
 
         public void run() {
+
+            RecordedStreamComparator.StreamComparison result
+                    = new RecordedStreamComparator().compare(actual, expected);
+
+            if (!result.streamEquals) {
+                throw new ExpectObservableException(result.toString(), caller);
+            }
+            /*
             if (actual.size() != expected.size()) {
                 throw new RuntimeException(
                         expected.size() + " event(s) expected, " + actual.size() + " observed"
@@ -194,8 +202,8 @@ public class MarbleScheduler extends TestScheduler {
 
             for (int i = 0; i < actual.size(); i++) {
 
-                Recorded<Notification<Object>> actualEvent = actual.get(i);
-                Recorded<Notification<Object>> expectedEvent = expected.get(i);
+                Recorded<Object> actualEvent = actual.get(i);
+                Recorded<Object> expectedEvent = expected.get(i);
                 if (actualEvent.time != expectedEvent.time) {
                     throw new ExpectObservableException(
                             "Expected event \"" + expectedEvent.value + "\" at " + expectedEvent.time
@@ -224,7 +232,7 @@ public class MarbleScheduler extends TestScheduler {
                             caller
                     );
                 }
-            }
+            }*/
         }
 
         @Override
