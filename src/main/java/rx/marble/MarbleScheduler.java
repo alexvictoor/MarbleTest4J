@@ -192,47 +192,6 @@ public class MarbleScheduler extends TestScheduler {
             if (!result.streamEquals) {
                 throw new ExpectObservableException(result.toString(), caller);
             }
-            /*
-            if (actual.size() != expected.size()) {
-                throw new RuntimeException(
-                        expected.size() + " event(s) expected, " + actual.size() + " observed"
-                        + "\n at " + caller
-                );
-            }
-
-            for (int i = 0; i < actual.size(); i++) {
-
-                Recorded<Object> actualEvent = actual.get(i);
-                Recorded<Object> expectedEvent = expected.get(i);
-                if (actualEvent.time != expectedEvent.time) {
-                    throw new ExpectObservableException(
-                            "Expected event \"" + expectedEvent.value + "\" at " + expectedEvent.time
-                                    + ", instead received \"" + actualEvent.value + "\" at " + actualEvent.time,
-                            caller
-                    );
-                }
-
-                if (actualEvent.value.getKind() != expectedEvent.value.getKind()) {
-                    throw new ExpectObservableException(
-                            "Expected event " + expectedEvent.value.getKind()
-                                    + ", instead received at " + actualEvent.value.getKind()
-                                    + "\n at ",
-                            caller
-                    );
-                }
-
-                if ((actualEvent.value.getValue() != null
-                        && !actualEvent.value.getValue().equals(expectedEvent.value.getValue()))
-                    || (actualEvent.value.getValue() == null && expectedEvent.value.getValue() != null)) {
-
-                    throw new ExpectObservableException(
-                            "Expected event was " + expectedEvent.value
-                                    + ", instead received " + actualEvent.value
-                                    + "\n at ",
-                            caller
-                    );
-                }
-            }*/
         }
 
         @Override

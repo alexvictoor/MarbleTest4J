@@ -3,6 +3,7 @@ package rx.marble;
 import rx.Notification;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
@@ -36,7 +37,7 @@ public class RecordedStreamComparator {
                 unitComparisons.add(new EventComparison(record, EventComparisonResult.EQUALS));
             }
         }
-        unitComparisons.sort(new Comparator<EventComparison>() {
+        Collections.sort(unitComparisons, new Comparator<EventComparison>() {
             @Override
             public int compare(EventComparison first, EventComparison second) {
 
