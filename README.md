@@ -1,5 +1,5 @@
 [![Build Status](https://travis-ci.org/alexvictoor/MarbleTest4J.svg?branch=master)](https://travis-ci.org/alexvictoor/MarbleTest4J)
-
+[![Quality Gate](https://sonarqube.com/api/badges/gate?key=com.github.alexvictoor%3Amarbletest4j)](https://sonarqube.com/dashboard/index/com.github.alexvictoor%3Amarbletest4j)
 # MarbleTest4j
 Java port of RxJS marble tests
 
