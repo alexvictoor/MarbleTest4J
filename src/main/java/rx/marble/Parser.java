@@ -19,7 +19,7 @@ public class Parser {
                                                                    boolean materializeInnerObservables) {
 
         if (marbles.indexOf('!') != -1) {
-            throw new RuntimeException("Conventional marble diagrams cannot have the unsubscription marker '!'");
+            throw new IllegalArgumentException("Conventional marble diagrams cannot have the unsubscription marker '!'");
         }
 
         int len = marbles.length();
@@ -106,20 +106,20 @@ public class Parser {
                     break;
                 case '^':
                     if (subscriptionFrame != Long.MAX_VALUE) {
-                        throw new RuntimeException("Found a second subscription point \'^\' in a " +
+                        throw new IllegalArgumentException("Found a second subscription point \'^\' in a " +
                                 "subscription marble diagram. There can only be one.");
                     }
                     subscriptionFrame = groupStart > -1 ? groupStart : frame;
                     break;
                 case '!':
                     if (unsubscriptionFrame != Long.MAX_VALUE) {
-                        throw new RuntimeException("Found a second subscription point \'^\' in a " +
+                        throw new IllegalArgumentException("Found a second subscription point \'^\' in a " +
                                 "subscription marble diagram. There can only be one.");
                     }
                     unsubscriptionFrame = groupStart > -1 ? groupStart : frame;
                     break;
                 default:
-                    throw new RuntimeException("There can only be \'^\' and \'!\' markers in a " +
+                    throw new IllegalArgumentException("There can only be \'^\' and \'!\' markers in a " +
                             "subscription marble diagram. Found instead \'' + c + '\'.");
             }
         }
