@@ -16,7 +16,7 @@ To get the lib just use add a maven dependency as below:
 <dependency>
   <groupId>com.github.alexvictoor</groupId>
   <artifactId>marbletest4j</artifactId>
-  <version>1.1.1</version>
+  <version>1.1.2</version>
 </dependency>
 ```
 
