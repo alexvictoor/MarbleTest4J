@@ -13,26 +13,26 @@ import java.util.List;
 public class RecordedStreamComparator {
 
     public StreamComparison compare(
-            List<Recorded<Object>> actualRecords,
-            List<Recorded<Object>> expectedRecords) {
+            List<Recorded<?>> actualRecords,
+            List<Recorded<?>> expectedRecords) {
 
         List<EventComparison> unitComparisons = new ArrayList<>();
 
-        List<Recorded<Object>> onlyOnExpected = new ArrayList<>(expectedRecords);
+        List<Recorded<?>> onlyOnExpected = new ArrayList<>(expectedRecords);
         onlyOnExpected.removeAll(actualRecords);
-        for (Recorded<Object> record : onlyOnExpected) {
+        for (Recorded<?> record : onlyOnExpected) {
             unitComparisons.add(new EventComparison(record, EventComparisonResult.ONLY_ON_EXPECTED));
         }
 
-        List<Recorded<Object>> onlyOnActual = new ArrayList<>(actualRecords);
+        List<Recorded<?>> onlyOnActual = new ArrayList<>(actualRecords);
         onlyOnActual.removeAll(expectedRecords);
-        for (Recorded<Object> record : onlyOnActual) {
+        for (Recorded<?> record : onlyOnActual) {
             unitComparisons.add(new EventComparison(record, EventComparisonResult.ONLY_ON_ACTUAL));
         }
 
         boolean equalStreams = unitComparisons.isEmpty();
 
-        for (Recorded<Object> record : actualRecords){
+        for (Recorded<?> record : actualRecords){
             if (!onlyOnActual.contains(record) && !onlyOnExpected.contains(record)) {
                 unitComparisons.add(new EventComparison(record, EventComparisonResult.EQUALS));
             }
@@ -41,7 +41,20 @@ public class RecordedStreamComparator {
             @Override
             public int compare(EventComparison first, EventComparison second) {
 
-                return new Long(first.record.time - second.record.time).intValue();
+                int diff = new Long(first.record.time - second.record.time).intValue();
+                if (diff == 0) {
+                    //
+                    // if events are simultaneous
+                    // on complete and on error should be last
+                    //
+                    if (first.record.value.isOnCompleted() || first.record.value.isOnError()) {
+                        return Integer.MAX_VALUE;
+                    }
+                    if (second.record.value.isOnCompleted() || second.record.value.isOnError()) {
+                        return Integer.MIN_VALUE;
+                    }
+                }
+                return diff;
             }
         });
 
@@ -92,10 +105,10 @@ public class RecordedStreamComparator {
     public enum EventComparisonResult { EQUALS, ONLY_ON_ACTUAL, ONLY_ON_EXPECTED }
 
     public static class EventComparison {
-        public final Recorded<Object> record;
+        public final Recorded<?> record;
         public final EventComparisonResult result;
 
-        public EventComparison(Recorded<Object> record, EventComparisonResult result) {
+        public EventComparison(Recorded<?> record, EventComparisonResult result) {
             this.record = record;
             this.result = result;
         }

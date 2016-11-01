@@ -3,6 +3,7 @@ package rx.marble;
 import org.junit.Test;
 import rx.Notification;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static java.util.Arrays.asList;
@@ -20,12 +21,11 @@ public class RecordedStreamComparatorTest {
     @Test
     public void should_detect_missing_event_in_actual_records() {
         // given
-        Recorded<Object> onCompletedEvent = new Recorded<>(10, Notification.createOnCompleted());
-        List<Recorded<Object>> actualRecords = asList(
-        );
-        List<Recorded<Object>> expectedRecords = asList(
-                onCompletedEvent
-        );
+        Recorded<?> onCompletedEvent = new Recorded<>(10, Notification.createOnCompleted());
+        List<Recorded<?>> actualRecords = asList();
+        List<Recorded<?>> expectedRecords = new ArrayList<>();
+        expectedRecords.add(onCompletedEvent);
+
         // when
         RecordedStreamComparator.StreamComparison result
                 = new RecordedStreamComparator().compare(actualRecords, expectedRecords);
@@ -41,11 +41,10 @@ public class RecordedStreamComparatorTest {
     public void should_detect_additional_event_in_actual_records() {
         // given
         Recorded<Object> onCompletedEvent = new Recorded<>(10, Notification.createOnCompleted());
-        List<Recorded<Object>> actualRecords = asList(
-                onCompletedEvent
-        );
-        List<Recorded<Object>> expectedRecords = asList(
-        );
+        List<Recorded<?>> actualRecords = new ArrayList<>();
+        actualRecords.add(onCompletedEvent);
+        List<Recorded<?>> expectedRecords = asList();
+
         // when
         RecordedStreamComparator.StreamComparison result
                 = new RecordedStreamComparator().compare(actualRecords, expectedRecords);
@@ -60,10 +59,13 @@ public class RecordedStreamComparatorTest {
     @Test
     public void should_detect_identical_streams() {
         // given
-        List<Recorded<Object>> first = asList(new Recorded<>(10, createOnNext((Object)12)));
-        List<Recorded<Object>> second = asList(new Recorded<>(10, createOnNext((Object)12)));
+        List<Recorded<?>> actualRecords = new ArrayList<>();
+        actualRecords.add(new Recorded<>(10, createOnNext(12)));
+        List<Recorded<?>> expectedRecords = new ArrayList<>();
+        expectedRecords.add(new Recorded<>(10, createOnNext(12)));
         // when
-        RecordedStreamComparator.StreamComparison result = new RecordedStreamComparator().compare(first, second);
+        RecordedStreamComparator.StreamComparison result
+                = new RecordedStreamComparator().compare(actualRecords, expectedRecords);
         // then
         assertThat(result.streamEquals).isTrue();
     }
@@ -71,10 +73,13 @@ public class RecordedStreamComparatorTest {
     @Test
     public void should_detect_identical_streams_ending_on_error() {
         // given
-        List<Recorded<Object>> first = asList(new Recorded<>(10, createOnError(new Exception("whatever"))));
-        List<Recorded<Object>> second = asList(new Recorded<>(10, createOnError(new Exception("whatever"))));
+        List<Recorded<?>> actualRecords = new ArrayList<>();
+        actualRecords.add(new Recorded<>(10, createOnError(new Exception("whatever"))));
+        List<Recorded<?>> expectedRecords = new ArrayList<>();
+        expectedRecords.add(new Recorded<>(10, createOnError(new Exception("whatever"))));
         // when
-        RecordedStreamComparator.StreamComparison result = new RecordedStreamComparator().compare(first, second);
+        RecordedStreamComparator.StreamComparison result
+                = new RecordedStreamComparator().compare(actualRecords, expectedRecords);
         // then
         assertThat(result.streamEquals).isTrue();
     }
@@ -82,13 +87,13 @@ public class RecordedStreamComparatorTest {
     @Test
     public void should_detect_equal_and_different_records() {
         // given
-        Recorded<Object> onCompletedEvent = new Recorded<>(20, Notification.createOnCompleted());
-        List<Recorded<Object>> actualRecords = asList(
-                new Recorded<>(5, createOnNext((Object)12)),
+        Recorded<?> onCompletedEvent = new Recorded<>(20, Notification.createOnCompleted());
+        List<Recorded<?>> actualRecords = asList(
+                new Recorded<>(5, createOnNext(12)),
                 onCompletedEvent
         );
-        List<Recorded<Object>> expectedRecords = asList(
-                new Recorded<>(15, createOnNext((Object)36)),
+        List<Recorded<?>> expectedRecords = asList(
+                new Recorded<>(15, createOnNext(36)),
                 onCompletedEvent
         );
         // when
@@ -101,6 +106,29 @@ public class RecordedStreamComparatorTest {
                 new RecordedStreamComparator.EventComparison(new Recorded<>(5, createOnNext((Object)12)), ONLY_ON_ACTUAL),
                 new RecordedStreamComparator.EventComparison(new Recorded<>(15, createOnNext((Object)36)), ONLY_ON_EXPECTED),
                 new RecordedStreamComparator.EventComparison(onCompletedEvent, EQUALS)
+        );
+
+    }
+
+    @Test
+    public void should_put_on_completed_events_after() {
+        // given
+        Recorded<?> onCompletedEvent = new Recorded<>(20, Notification.createOnCompleted());
+        List<Recorded<?>> actualRecords = asList(
+                new Recorded<>(20, createOnNext(12)),
+                onCompletedEvent
+        );
+        List<Recorded<?>> expectedRecords = new ArrayList<>();
+        expectedRecords.add(new Recorded<>(20, createOnNext(12)));
+        // when
+        RecordedStreamComparator.StreamComparison result
+                = new RecordedStreamComparator().compare(actualRecords, expectedRecords);
+        // then
+        assertThat(result.streamEquals).isFalse();
+        assertThat(result.unitComparisons).hasSize(2);
+        assertThat(result.unitComparisons).containsExactly(
+                new RecordedStreamComparator.EventComparison(new Recorded<>(20, createOnNext(12)), EQUALS),
+                new RecordedStreamComparator.EventComparison(onCompletedEvent, ONLY_ON_ACTUAL)
         );
 
     }

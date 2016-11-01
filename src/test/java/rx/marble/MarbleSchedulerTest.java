@@ -213,6 +213,18 @@ public class MarbleSchedulerTest {
     }
 
     @Test
+    public void should_indicate_events_values_when_assertions_fails() {
+        MarbleScheduler scheduler = new MarbleScheduler();
+        scheduler.expectObservable(Observable.just("hello")).toBe("--h#", of("h", "hola"), new Exception());
+        try {
+            scheduler.flush();
+        } catch(ExpectObservableException ex) {
+            assertThat(ex.getMessage()).contains("hello");
+            assertThat(ex.getMessage()).contains("On Error");
+        }
+    }
+
+    @Test
     public void should_indicate_failed_assertion_when_no_expected_subscription() {
         MarbleScheduler scheduler = new MarbleScheduler();
         ColdObservable<?> myObservable

@@ -72,7 +72,7 @@ public class MarbleScheduler extends TestScheduler {
     public <T> ISetupTest expectObservable(Observable<T> observable, String unsubscriptionMarbles) {
         String caller = ExceptionHelper.findCallerInStackTrace(getClass());
         FlushableTest flushTest = new FlushableTest(caller);
-        final List<Recorded<Object>> actual = new ArrayList<>();
+        final List<Recorded<?>> actual = new ArrayList<>();
         flushTest.actual = actual;
         long unsubscriptionFrame = Long.MAX_VALUE;
 
@@ -90,7 +90,7 @@ public class MarbleScheduler extends TestScheduler {
                         if (value instanceof Observable) {
                             value = materializeInnerObservable((Observable)value, now());
                         }
-                        actual.add(new Recorded<>(now(), Notification.createOnNext(value)));
+                        actual.add(new Recorded<>(now(), (Notification<?>)Notification.createOnNext(value)));
                     }
                 },
                 new Action1<Throwable>() {
@@ -177,8 +177,8 @@ public class MarbleScheduler extends TestScheduler {
     class FlushableTest implements ITestOnFlush {
         private final String caller;
         private boolean ready;
-        public List<Recorded<Object>> actual;
-        public List<Recorded<Object>> expected;
+        public List<Recorded<?>> actual;
+        public List expected;
 
         public FlushableTest(String caller) {
             this.caller = caller;
