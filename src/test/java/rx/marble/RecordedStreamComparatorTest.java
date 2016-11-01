@@ -7,6 +7,7 @@ import java.util.List;
 
 import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
+import static rx.Notification.createOnError;
 import static rx.Notification.createOnNext;
 import static rx.marble.RecordedStreamComparator.EventComparisonResult.*;
 
@@ -68,7 +69,18 @@ public class RecordedStreamComparatorTest {
     }
 
     @Test
-    public void should_detect_equals_and_different_records() {
+    public void should_detect_identical_streams_ending_on_error() {
+        // given
+        List<Recorded<Object>> first = asList(new Recorded<>(10, createOnError(new Exception("whatever"))));
+        List<Recorded<Object>> second = asList(new Recorded<>(10, createOnError(new Exception("whatever"))));
+        // when
+        RecordedStreamComparator.StreamComparison result = new RecordedStreamComparator().compare(first, second);
+        // then
+        assertThat(result.streamEquals).isTrue();
+    }
+
+    @Test
+    public void should_detect_equal_and_different_records() {
         // given
         Recorded<Object> onCompletedEvent = new Recorded<>(20, Notification.createOnCompleted());
         List<Recorded<Object>> actualRecords = asList(

@@ -46,8 +46,19 @@ public class Recorded<T> {
         Recorded<?> recorded = (Recorded<?>) o;
 
         if (time != recorded.time) return false;
-        return !(value != null ? !value.equals(recorded.value) : recorded.value != null);
 
+        return !(value != null ? ! notificationsAreEqual(value, recorded.value) : recorded.value != null);
+    }
+
+    private boolean notificationsAreEqual(Notification<?> first, Notification<?> second) {
+        if (first == null || second == null) {
+            return false;
+        }
+        if ((first.getKind() == second.getKind()) && (first.getKind() == Notification.Kind.OnError)) {
+            // we do not do deep comparisons on exceptions
+            return true;
+        }
+        return first.equals(second);
     }
 
     @Override
