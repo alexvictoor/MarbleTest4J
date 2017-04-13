@@ -19,11 +19,11 @@ public class HotObservableTest {
         Recorded<String> event = new Recorded<>(10, Notification.createOnNext("Hello world!"));
         HotObservable<String> hotObservable = HotObservable.create(scheduler, event);
         // when
-        TestObserver<String> subscriber = new TestObserver<>();
-        hotObservable.subscribe(subscriber);
+        TestObserver<String> observer = new TestObserver<>();
+        hotObservable.subscribe(observer);
         // then
         scheduler.advanceTimeBy(10, TimeUnit.SECONDS);
-        subscriber.assertValue("Hello world!");
+        observer.assertValue("Hello world!");
     }
 
     @Test
@@ -33,16 +33,16 @@ public class HotObservableTest {
         Recorded<String> event = new Recorded<>(10, Notification.createOnNext("Hello world!"));
         final HotObservable<String> hotObservable = HotObservable.create(scheduler, event);
         // when
-        final TestObserver<String> subscriber = new TestObserver<>();
+        final TestObserver<String> observer = new TestObserver<>();
         scheduler.createWorker().schedule(new Runnable() {
             @Override
             public void run() {
-                hotObservable.subscribe(subscriber);
+                hotObservable.subscribe(observer);
             }
         }, 15, TimeUnit.MILLISECONDS);
         // then
         scheduler.advanceTimeBy(Long.MAX_VALUE, TimeUnit.MILLISECONDS);
-        subscriber.assertNoValues();
+        observer.assertNoValues();
     }
 
     @Test
@@ -52,18 +52,18 @@ public class HotObservableTest {
         Recorded<String> event = new Recorded<>(10, Notification.createOnNext("Hello world!"));
         final HotObservable<String> hotObservable = HotObservable.create(scheduler, event);
         // when
-        final TestObserver<String> subscriber = new TestObserver<>();
-        hotObservable.subscribe(subscriber);
+        final TestObserver<String> observer = new TestObserver<>();
+        hotObservable.subscribe(observer);
 
         scheduler.createWorker().schedule(new Runnable() {
             @Override
             public void run() {
-                subscriber.dispose();
+                observer.dispose();
             }
         }, 5, TimeUnit.MILLISECONDS);
         // then
         scheduler.advanceTimeBy(Long.MAX_VALUE, TimeUnit.MILLISECONDS);
-        subscriber.assertNoValues();
+        observer.assertNoValues();
     }
 
     @Test
@@ -72,12 +72,12 @@ public class HotObservableTest {
         TestScheduler scheduler = new TestScheduler();
         final HotObservable<String> hotObservable = HotObservable.create(scheduler);
         // when
-        final TestObserver<String> subscriber = new TestObserver<>();
+        final TestObserver<String> observer = new TestObserver<>();
 
         scheduler.createWorker().schedule(new Runnable() {
             @Override
             public void run() {
-                hotObservable.subscribe(subscriber);
+                hotObservable.subscribe(observer);
             }
         }, 42, TimeUnit.MILLISECONDS);
         // then
@@ -94,12 +94,12 @@ public class HotObservableTest {
         TestScheduler scheduler = new TestScheduler();
         final HotObservable<String> hotObservable = HotObservable.create(scheduler);
         // when
-        final TestObserver<String> subscriber = new TestObserver<>();
-        hotObservable.subscribe(subscriber);
+        final TestObserver<String> observer = new TestObserver<>();
+        hotObservable.subscribe(observer);
         scheduler.createWorker().schedule(new Runnable() {
             @Override
             public void run() {
-                subscriber.dispose();
+                observer.dispose();
             }
         }, 42, TimeUnit.MILLISECONDS);
         // then
@@ -116,19 +116,19 @@ public class HotObservableTest {
         TestScheduler scheduler = new TestScheduler();
         final HotObservable<String> hotObservable = HotObservable.create(scheduler);
         // when
-        final TestObserver<String> subscriber1 = new TestObserver<>();
-        final TestObserver<String> subscriber2 = new TestObserver<>();
-        hotObservable.subscribe(subscriber1);
+        final TestObserver<String> observer1 = new TestObserver<>();
+        final TestObserver<String> observer2 = new TestObserver<>();
+        hotObservable.subscribe(observer1);
         scheduler.createWorker().schedule(new Runnable() {
             @Override
             public void run() {
-                hotObservable.subscribe(subscriber2);
+                hotObservable.subscribe(observer2);
             }
         }, 36, TimeUnit.MILLISECONDS);
         scheduler.createWorker().schedule(new Runnable() {
             @Override
             public void run() {
-                subscriber1.dispose();
+                observer1.dispose();
             }
         }, 42, TimeUnit.MILLISECONDS);
         // then
