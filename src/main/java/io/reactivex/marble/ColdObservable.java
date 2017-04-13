@@ -4,27 +4,62 @@ package io.reactivex.marble;
 import io.reactivex.Observable;
 import io.reactivex.Observer;
 import io.reactivex.Scheduler;
+import io.reactivex.disposables.Disposable;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 
 public class ColdObservable<T> extends Observable<T> implements TestableObservable<T> {
 
-    private final List<Recorded<T>> notifications = null;
-    private List<SubscriptionLog> subscriptions = new ArrayList<>();
+    private final Scheduler scheduler;
+    private final List<Recorded<T>> recordedNotifications;
+    private final List<SubscriptionLog> subscriptions = new ArrayList<>();
 
-    /*private ColdObservable(OnSubscribe<T> f, List<Recorded<T>> notifications) {
-        super(f);
-        this.notifications = notifications;
-    }*/
+    public ColdObservable(Scheduler scheduler, List<Recorded<T>> notifications) {
+        this.scheduler = scheduler;
+        this.recordedNotifications = notifications;
+    }
 
     @Override
-    protected void subscribeActual(Observer<? super T> observer) {
+    protected void subscribeActual(final Observer<? super T> observer) {
+        final SubscriptionLog subscriptionLog = new SubscriptionLog(scheduler.now(TimeUnit.MILLISECONDS));
+        subscriptions.add(subscriptionLog);
+        final int subscriptionIndex = subscriptions.size() - 1;
+        final Scheduler.Worker worker = scheduler.createWorker();
+        for (final Recorded<T> recorded: recordedNotifications) {
+            worker.schedule(new Runnable() {
+                @Override
+                public void run() {
+                    NotificationHelper.accept(recorded.value, observer);
+                }
+            }, recorded.time, TimeUnit.MILLISECONDS);
+        }
 
+        observer.onSubscribe(new Disposable() {
+
+            private boolean disposed = false;
+
+            @Override
+            public void dispose() {
+                disposed = true;
+                subscriptions.set(
+                        subscriptionIndex,
+                        new SubscriptionLog(subscriptionLog.subscribe, scheduler.now(TimeUnit.MILLISECONDS))
+                );
+                worker.dispose();
+            }
+
+            @Override
+            public boolean isDisposed() {
+                return disposed;
+            }
+        });
     }
+
     @Override
     public List<SubscriptionLog> getSubscriptions() {
         return Collections.unmodifiableList(subscriptions);
@@ -32,7 +67,7 @@ public class ColdObservable<T> extends Observable<T> implements TestableObservab
 
     @Override
     public List<Recorded<T>> getMessages() {
-        return Collections.unmodifiableList(notifications);
+        return Collections.unmodifiableList(recordedNotifications);
     }
 
     public static <T> ColdObservable<T> create(Scheduler scheduler, Recorded<T>... notifications) {
@@ -40,52 +75,8 @@ public class ColdObservable<T> extends Observable<T> implements TestableObservab
     }
 
     public static <T> ColdObservable<T> create(Scheduler scheduler, List<Recorded<T>> notifications) {
-        //OnSubscribeHandler<T> onSubscribeFunc = new OnSubscribeHandler<>(scheduler, notifications);
-        //ColdObservable<T> observable = new ColdObservable<>(onSubscribeFunc, notifications);
-        //onSubscribeFunc.observable = observable;
-        return null; //observable;
+        ColdObservable<T> observable = new ColdObservable<>(scheduler, notifications);
+        return observable;
     }
 
-
-/*
-    private static class OnSubscribeHandler<T> implements OnSubscribe<T> {
-
-        private final Scheduler scheduler;
-        private final List<Recorded<T>> notifications;
-        public ColdObservable observable;
-
-        public OnSubscribeHandler(Scheduler scheduler, List<Recorded<T>> notifications) {
-            this.scheduler = scheduler;
-            this.notifications = notifications;
-        }
-
-        public void call(final Subscriber<? super T> subscriber) {
-            final SubscriptionLog subscriptionLog = new SubscriptionLog(scheduler.now());
-            observable.subscriptions.add(subscriptionLog);
-            final int subscriptionIndex = observable.getSubscriptions().size() - 1;
-            Scheduler.Worker worker = scheduler.createWorker();
-            subscriber.add(worker); // not scheduling after unsubscribe
-
-            for (final Recorded<T> notification: notifications) {
-                worker.schedule(new Action0() {
-                    @Override
-                    public void call() {
-                        notification.value.accept(subscriber);
-                    }
-                }, notification.time, TimeUnit.MILLISECONDS);
-            }
-
-            subscriber.add((Subscriptions.create(new Action0() {
-                @Override
-                public void call() {
-                    // on unsubscribe
-                    observable.subscriptions.set(
-                            subscriptionIndex,
-                            new SubscriptionLog(subscriptionLog.subscribe, scheduler.now())
-                    );
-                }
-            })));
-        }
-    }
-    */
 }
