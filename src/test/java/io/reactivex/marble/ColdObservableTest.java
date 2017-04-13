@@ -1,14 +1,9 @@
 package io.reactivex.marble;
 
+import io.reactivex.Notification;
+import io.reactivex.observers.TestObserver;
+import io.reactivex.schedulers.TestScheduler;
 import org.junit.Test;
-import rx.Notification;
-import rx.Subscription;
-import rx.functions.Action0;
-import rx.marble.ColdObservable;
-import rx.marble.Recorded;
-import rx.marble.SubscriptionLog;
-import rx.observers.TestSubscriber;
-import rx.schedulers.TestScheduler;
 
 import java.util.concurrent.TimeUnit;
 
@@ -25,11 +20,11 @@ public class ColdObservableTest {
         Recorded<String> event = new Recorded<>(0, Notification.createOnNext("Hello world!"));
         ColdObservable<String> coldObservable = ColdObservable.create(scheduler, event);
         // when
-        TestSubscriber<String> subscriber = new TestSubscriber<>();
-        coldObservable.subscribe(subscriber);
+        TestObserver<String> observer = new TestObserver<>();
+        coldObservable.subscribe(observer);
         // then
         scheduler.advanceTimeBy(1, TimeUnit.SECONDS);
-        assertThat(subscriber.getOnNextEvents()).containsExactly("Hello world!");
+        observer.assertValue("Hello world!");
     }
 
     @Test
@@ -40,13 +35,13 @@ public class ColdObservableTest {
         Recorded<String> event = new Recorded<>(offset, Notification.createOnNext("Hello world!"));
         ColdObservable<String> coldObservable = ColdObservable.create(scheduler, event);
         // when
-        TestSubscriber<String> subscriber = new TestSubscriber<>();
-        coldObservable.subscribe(subscriber);
+        TestObserver<String> observer = new TestObserver<>();
+        coldObservable.subscribe(observer);
         // then
         scheduler.advanceTimeBy(9, TimeUnit.MILLISECONDS);
-        assertThat(subscriber.getOnNextEvents()).isEmpty();
+        observer.assertNoValues();
         scheduler.advanceTimeBy(1, TimeUnit.MILLISECONDS);
-        assertThat(subscriber.getOnNextEvents()).containsExactly("Hello world!");
+        observer.assertValue("Hello world!");
     }
 
     @Test
@@ -56,18 +51,18 @@ public class ColdObservableTest {
         long offset = 10;
         Recorded<String> event = new Recorded<>(offset, Notification.createOnNext("Hello world!"));
         ColdObservable<String> coldObservable = ColdObservable.create(scheduler, event);
-        TestSubscriber<String> subscriber = new TestSubscriber<>();
-        final Subscription subscription = coldObservable.subscribe(subscriber);
+        final TestObserver<String> observer = new TestObserver<>();
+        coldObservable.subscribe(observer);
         // when
-        scheduler.createWorker().schedule(new Action0() {
+        scheduler.createWorker().schedule(new Runnable() {
             @Override
-            public void call() {
-                subscription.unsubscribe();
+            public void run() {
+                observer.dispose();
             }
         }, 5, TimeUnit.MILLISECONDS);
         // then
         scheduler.advanceTimeBy(Long.MAX_VALUE, TimeUnit.MILLISECONDS);
-        assertThat(subscriber.getOnNextEvents()).isEmpty();
+        observer.assertNoValues();
     }
 
     @Test
@@ -77,16 +72,16 @@ public class ColdObservableTest {
         Recorded<String> event = new Recorded<>(0, Notification.createOnNext("Hello world!"));
         final ColdObservable<String> coldObservable = ColdObservable.create(scheduler, event);
         // when
-        final TestSubscriber<String> subscriber = new TestSubscriber<>();
-        scheduler.createWorker().schedule(new Action0() {
+        final TestObserver<String> observer = new TestObserver<>();
+        scheduler.createWorker().schedule(new Runnable() {
             @Override
-            public void call() {
-                coldObservable.subscribe(subscriber);
+            public void run() {
+                coldObservable.subscribe(observer);
             }
         }, 42, TimeUnit.SECONDS);
         // then
         scheduler.advanceTimeBy(42, TimeUnit.SECONDS);
-        assertThat(subscriber.getOnNextEvents()).containsExactly("Hello world!");
+        observer.assertValue("Hello world!");
     }
 
     @Test
@@ -95,12 +90,12 @@ public class ColdObservableTest {
         TestScheduler scheduler = new TestScheduler();
         final ColdObservable<String> coldObservable = ColdObservable.create(scheduler);
         // when
-        final TestSubscriber<String> subscriber = new TestSubscriber<>();
+        final TestObserver<String> observer = new TestObserver<>();
 
-        scheduler.createWorker().schedule(new Action0() {
+        scheduler.createWorker().schedule(new Runnable() {
             @Override
-            public void call() {
-                coldObservable.subscribe(subscriber);
+            public void run() {
+                coldObservable.subscribe(observer);
             }
         }, 42, TimeUnit.MILLISECONDS);
         // then
@@ -117,12 +112,12 @@ public class ColdObservableTest {
         TestScheduler scheduler = new TestScheduler();
         final ColdObservable<String> coldObservable = ColdObservable.create(scheduler);
         // when
-        final TestSubscriber<String> subscriber = new TestSubscriber<>();
-        final Subscription subscription = coldObservable.subscribe(subscriber);
-        scheduler.createWorker().schedule(new Action0() {
+        final TestObserver<String> observer = new TestObserver<>();
+        coldObservable.subscribe(observer);
+        scheduler.createWorker().schedule(new Runnable() {
             @Override
-            public void call() {
-                subscription.unsubscribe();
+            public void run() {
+                observer.dispose();
             }
         }, 42, TimeUnit.MILLISECONDS);
         // then
@@ -139,19 +134,19 @@ public class ColdObservableTest {
         TestScheduler scheduler = new TestScheduler();
         final ColdObservable<String> coldObservable = ColdObservable.create(scheduler);
         // when
-        final TestSubscriber<String> subscriber1 = new TestSubscriber<>();
-        final TestSubscriber<String> subscriber2 = new TestSubscriber<>();
-        final Subscription subscription = coldObservable.subscribe(subscriber1);
-        scheduler.createWorker().schedule(new Action0() {
+        final TestObserver<String> observer1 = new TestObserver<>();
+        final TestObserver<String> observer2 = new TestObserver<>();
+        coldObservable.subscribe(observer1);
+        scheduler.createWorker().schedule(new Runnable() {
             @Override
-            public void call() {
-                coldObservable.subscribe(subscriber2);
+            public void run() {
+                coldObservable.subscribe(observer2);
             }
         }, 36, TimeUnit.MILLISECONDS);
-        scheduler.createWorker().schedule(new Action0() {
+        scheduler.createWorker().schedule(new Runnable() {
             @Override
-            public void call() {
-                subscription.unsubscribe();
+            public void run() {
+                observer1.dispose();
             }
         }, 42, TimeUnit.MILLISECONDS);
         // then
