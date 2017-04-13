@@ -4,6 +4,7 @@ package io.reactivex.marble;
 import io.reactivex.Notification;
 import io.reactivex.Observable;
 import io.reactivex.Scheduler;
+import io.reactivex.annotations.NonNull;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Action;
 import io.reactivex.functions.Consumer;
@@ -34,9 +35,26 @@ public class MarbleScheduler extends Scheduler {
     }
 
     @Override
+    public long now(@NonNull TimeUnit unit) {
+        return testScheduler.now(unit);
+    }
+
+    public void advanceTimeBy(long delayTime, TimeUnit unit) {
+        testScheduler.advanceTimeBy(delayTime, unit);
+    }
+
+    public void advanceTimeTo(long delayTime, TimeUnit unit) {
+        testScheduler.advanceTimeTo(delayTime, unit);
+    }
+
+    public void triggerActions() {
+        testScheduler.triggerActions();
+    }
+
+    @Override
+    @NonNull
     public Worker createWorker() {
-        // TODO
-        return null;
+        return testScheduler.createWorker();
     }
 
     public <T> ColdObservable<T> createColdObservable(String marbles, Map<String, T> values) {
@@ -99,20 +117,20 @@ public class MarbleScheduler extends Scheduler {
                         Object value = x;
                         // Support Observable-of-Observables
                         if (value instanceof Observable) {
-                            value = materializeInnerObservable((Observable)value, testScheduler.now(TimeUnit.MILLISECONDS));
+                            value = materializeInnerObservable((Observable)value, now(TimeUnit.MILLISECONDS));
                         }
-                        actual.add(new Recorded<>(testScheduler.now(TimeUnit.MILLISECONDS), (Notification<?>) Notification.createOnNext(value)));
+                        actual.add(new Recorded<>(now(TimeUnit.MILLISECONDS), (Notification<?>) Notification.createOnNext(value)));
                     }
                 },
                 new Consumer<Throwable>() {
                     @Override
                     public void accept(Throwable throwable) {
-                        actual.add(new Recorded<>(testScheduler.now(TimeUnit.MILLISECONDS), Notification.createOnError(throwable)));
+                        actual.add(new Recorded<>(now(TimeUnit.MILLISECONDS), Notification.createOnError(throwable)));
                     }
                 }, new Action() {
                     @Override
                     public void run() {
-                        actual.add(new Recorded<>(testScheduler.now(TimeUnit.MILLISECONDS), Notification.createOnComplete()));
+                        actual.add(new Recorded<>(now(TimeUnit.MILLISECONDS), Notification.createOnComplete()));
                     }
                 });
 
@@ -136,17 +154,17 @@ public class MarbleScheduler extends Scheduler {
                 new Consumer() {
                     @Override
                     public void accept(Object x) {
-                        messages.add(new Recorded<>(testScheduler.now(TimeUnit.MILLISECONDS) - outerFrame, Notification.createOnNext(x)));
+                        messages.add(new Recorded<>(now(TimeUnit.MILLISECONDS) - outerFrame, Notification.createOnNext(x)));
                     }
                 }, new Consumer<Throwable>() {
                     @Override
                     public void accept(Throwable throwable) {
-                        messages.add(new Recorded<>(testScheduler.now(TimeUnit.MILLISECONDS) - outerFrame, Notification.createOnError(throwable)));
+                        messages.add(new Recorded<>(now(TimeUnit.MILLISECONDS) - outerFrame, Notification.createOnError(throwable)));
                     }
                 }, new Action() {
                     @Override
                     public void run() {
-                        messages.add(new Recorded<>(testScheduler.now(TimeUnit.MILLISECONDS) - outerFrame, Notification.createOnComplete()));
+                        messages.add(new Recorded<>(now(TimeUnit.MILLISECONDS) - outerFrame, Notification.createOnComplete()));
                     }
                 });
 

@@ -19,19 +19,15 @@ public class Recorded<T> {
     @Override
     public String toString() {
 
-        final String valueString = "TODO";
-        /*
-        switch (value.getKind()) {
-            case OnCompleted:
-                valueString = "On Completed";
-                break;
-            case OnError:
-                valueString =  "On Error";
-                break;
-            default:
-                valueString = "On Next: " + value.getValue();
+        final String valueString;
+
+        if (value.isOnComplete()) {
+            valueString = "On Completed";
+        } else if (value.isOnError()) {
+            valueString =  "On Error";
+        } else {
+            valueString = "On Next: " + value.getValue();
         }
-*/
 
         return "{\n" +
                 "  time = " + time +
@@ -55,11 +51,11 @@ public class Recorded<T> {
         if (first == null || second == null) {
             return false;
         }
-        /* TODO
-        if ((first.getKind() == second.getKind()) && (first.getKind() == Notification.Kind.OnError)) {
-            // we do not do deep comparisons on exceptions
+
+        if (first.isOnError() && second.isOnError()) {
+           // we do not do deep comparisons on exceptions
             return true;
-        }*/
+        }
         return first.equals(second);
     }
 

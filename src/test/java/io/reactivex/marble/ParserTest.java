@@ -1,12 +1,8 @@
 package io.reactivex.marble;
 
 
+import io.reactivex.Notification;
 import org.junit.Test;
-import rx.Notification;
-import rx.marble.ColdObservable;
-import rx.marble.Parser;
-import rx.marble.Recorded;
-import rx.marble.SubscriptionLog;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -28,7 +24,7 @@ public class ParserTest {
         assertThat(result).containsExactly(
                 new Recorded<>(70, Notification.createOnNext((Object)"A")),
                 new Recorded<>(110, Notification.createOnNext((Object)"B")),
-                new Recorded<>(150, Notification.createOnCompleted())
+                new Recorded<>(150, Notification.createOnComplete())
         );
     }
 
@@ -42,7 +38,7 @@ public class ParserTest {
         assertThat(result).containsExactly(
                 new Recorded<>(20, Notification.createOnNext((Object)"A")),
                 new Recorded<>(50, Notification.createOnNext((Object)"B")),
-                new Recorded<>(80, Notification.createOnCompleted())
+                new Recorded<>(80, Notification.createOnComplete())
         );
     }
 
@@ -56,7 +52,7 @@ public class ParserTest {
         assertThat(result).containsExactly(
                 new Recorded<>(40, Notification.createOnNext((Object)"A")),
                 new Recorded<>(80, Notification.createOnNext((Object)"B")),
-                new Recorded<>(120, Notification.createOnCompleted())
+                new Recorded<>(120, Notification.createOnComplete())
         );
     }
 
@@ -82,7 +78,7 @@ public class ParserTest {
         assertThat(result).containsExactly(
                 new Recorded<>(20, Notification.createOnNext("a")),
                 new Recorded<>(50, Notification.createOnNext("b")),
-                new Recorded<>(80, Notification.<String>createOnCompleted())
+                new Recorded<>(80, Notification.<String>createOnComplete())
         );
     }
 
