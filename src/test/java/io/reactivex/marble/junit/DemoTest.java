@@ -1,18 +1,17 @@
 package io.reactivex.marble.junit;
 
 
+import io.reactivex.Observable;
+import io.reactivex.functions.BiFunction;
+import io.reactivex.functions.Function;
+import io.reactivex.marble.ColdObservable;
 import org.junit.Rule;
 import org.junit.Test;
-import rx.Observable;
-import rx.functions.Func1;
-import rx.functions.Func2;
-import rx.marble.ColdObservable;
-import rx.marble.junit.MarbleRule;
 
 import java.util.Map;
 
-import static rx.marble.MapHelper.of;
-import static rx.marble.junit.MarbleRule.*;
+import static io.reactivex.marble.MapHelper.of;
+import static io.reactivex.marble.junit.MarbleRule.*;
 
 public class DemoTest {
 
@@ -24,9 +23,9 @@ public class DemoTest {
         // given
         Observable<String> input = hot("a-b-c-d");
         // when
-        Observable<String> output = input.map(new Func1<String, String>() {
+        Observable<String> output = input.map(new Function<String, String>() {
             @Override
-            public String call(String s) {
+            public String apply(String s) {
                 return s.toUpperCase();
             }
         });
@@ -39,9 +38,9 @@ public class DemoTest {
         // given
         Observable<Integer> input = cold("a-b-c-d", of("a", 1, "b", 2, "c", 3, "d", 4));
         // when
-        Observable<Integer> output = input.scan(new Func2<Integer, Integer, Integer>() {
+        Observable<Integer> output = input.scan(new BiFunction<Integer, Integer, Integer>() {
             @Override
-            public Integer call(Integer first, Integer second) {
+            public Integer apply(Integer first, Integer second) {
                 return first + second;
             }
         });
