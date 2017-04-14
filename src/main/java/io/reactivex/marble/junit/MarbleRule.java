@@ -1,7 +1,7 @@
 package io.reactivex.marble.junit;
 
 
-import io.reactivex.Observable;
+import io.reactivex.*;
 import io.reactivex.marble.*;
 import org.junit.rules.TestRule;
 import org.junit.runner.Description;
@@ -46,6 +46,38 @@ public class MarbleRule implements TestRule {
 
     public static ISetupTest expectObservable(Observable<?> actual, String unsubscriptionMarbles) {
         return schedulerHolder.get().expectObservable(actual, unsubscriptionMarbles);
+    }
+
+    public static ISetupTest expectFlowable(Flowable<?> actual) {
+        return schedulerHolder.get().expectObservable(actual.toObservable());
+    }
+
+    public static ISetupTest expectFlowable(Flowable<?> actual, String unsubscriptionMarbles) {
+        return schedulerHolder.get().expectObservable(actual.toObservable(), unsubscriptionMarbles);
+    }
+
+    public static ISetupTest expectSingle(Single<?> actual) {
+        return schedulerHolder.get().expectObservable(actual.toObservable());
+    }
+
+    public static ISetupTest expectSingle(Single<?> actual, String unsubscriptionMarbles) {
+        return schedulerHolder.get().expectObservable(actual.toObservable(), unsubscriptionMarbles);
+    }
+
+    public static ISetupTest expectMaybe(Maybe<?> actual) {
+        return schedulerHolder.get().expectObservable(actual.toObservable());
+    }
+
+    public static ISetupTest expectCompletable(Completable actual, String unsubscriptionMarbles) {
+        return schedulerHolder.get().expectObservable(actual.toObservable(), unsubscriptionMarbles);
+    }
+
+    public static ISetupTest expectCompletable(Completable actual) {
+        return schedulerHolder.get().expectObservable(actual.toObservable());
+    }
+
+    public static ISetupTest expectMaybe(Maybe<?> actual, String unsubscriptionMarbles) {
+        return schedulerHolder.get().expectObservable(actual.toObservable(), unsubscriptionMarbles);
     }
 
     public static ISetupSubscriptionsTest expectSubscriptions(List<SubscriptionLog> subscriptions) {
