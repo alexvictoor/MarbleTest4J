@@ -33,9 +33,21 @@ public class HotObservable<T> extends Observable<T> implements TestableObservabl
                 public void run() {
                 for (Observer<? super T> observer : observers){
                     NotificationHelper.accept(event.value, observer);
+                    if (!event.value.isOnNext()) {
+                        endSubscriptions(event.time);
+                    }
                 }
                 }
             }, event.time, TimeUnit.MILLISECONDS);
+        }
+    }
+
+    private void endSubscriptions(long time) {
+        for (int i = 0; i < subscriptions.size(); i++) {
+            SubscriptionLog subscription = subscriptions.get(i);
+            if (subscription.doesNeverEnd()) {
+                subscriptions.set(i, new SubscriptionLog(subscription.subscribe, time));
+            }
         }
     }
 
@@ -64,6 +76,7 @@ public class HotObservable<T> extends Observable<T> implements TestableObservabl
             }
         });
     }
+
     @Override
     public List<SubscriptionLog> getSubscriptions() {
         return Collections.unmodifiableList(subscriptions);

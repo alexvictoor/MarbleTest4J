@@ -17,6 +17,10 @@ public class SubscriptionLog {
         this.unsubscribe = unsubscribe;
     }
 
+    public boolean doesNeverEnd() {
+        return unsubscribe == Long.MAX_VALUE;
+    }
+
     @Override
     public String toString() {
         return "SubscriptionLog{" +

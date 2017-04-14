@@ -2,11 +2,13 @@ package io.reactivex.marble;
 
 
 import io.reactivex.Observable;
+import io.reactivex.Observer;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Function;
 import io.reactivex.observers.TestObserver;
+import io.reactivex.subjects.BehaviorSubject;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.Collections;
@@ -148,7 +150,6 @@ public class MarbleSchedulerTest {
     }
 
     @Test
-    @Ignore
     public void should_assert_subscriptions_of_a_cold_observable() {
         ColdObservable<String> source = scheduler.createColdObservable("---a---b-|");
         String subs =                                                  "^--------!";
@@ -157,7 +158,14 @@ public class MarbleSchedulerTest {
     }
 
     @Test
-    @Ignore
+    public void should_assert_subscriptions_of_a_hot_observable() {
+        HotObservable<String> source = scheduler.createHotObservable("---a---b-|");
+        String subs =                                                  "^--------!";
+        scheduler.expectSubscriptions(source.getSubscriptions()).toBe(subs);
+        source.subscribe();
+    }
+
+    @Test
     public void should_be_awesome() {
         Map<String, ?> values = of("a", 1, "b", 2);
         ColdObservable<?> myObservable

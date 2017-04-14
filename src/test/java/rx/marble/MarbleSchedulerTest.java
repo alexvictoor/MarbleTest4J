@@ -5,9 +5,11 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import rx.Observable;
+import rx.Subscription;
 import rx.functions.Action0;
 import rx.functions.Func1;
 import rx.observers.TestSubscriber;
+import rx.subjects.BehaviorSubject;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;

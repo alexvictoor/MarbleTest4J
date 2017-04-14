@@ -30,13 +30,16 @@ public class ColdObservable<T> extends Observable<T> implements TestableObservab
         subscriptions.add(subscriptionLog);
         final int subscriptionIndex = subscriptions.size() - 1;
         final Scheduler.Worker worker = scheduler.createWorker();
-        for (final Recorded<T> recorded: recordedNotifications) {
+        for (final Recorded<T> event: recordedNotifications) {
             worker.schedule(new Runnable() {
                 @Override
                 public void run() {
-                    NotificationHelper.accept(recorded.value, observer);
+                    NotificationHelper.accept(event.value, observer);
+                    if (!event.value.isOnNext()) {
+                        endSubscriptions(event.time);
+                    }
                 }
-            }, recorded.time, TimeUnit.MILLISECONDS);
+            }, event.time, TimeUnit.MILLISECONDS);
         }
 
         observer.onSubscribe(new Disposable() {
@@ -58,6 +61,15 @@ public class ColdObservable<T> extends Observable<T> implements TestableObservab
                 return disposed;
             }
         });
+    }
+
+    private void endSubscriptions(long time) {
+        for (int i = 0; i < subscriptions.size(); i++) {
+            SubscriptionLog subscription = subscriptions.get(i);
+            if (subscription.doesNeverEnd()) {
+                subscriptions.set(i, new SubscriptionLog(subscription.subscribe, time));
+            }
+        }
     }
 
     @Override
