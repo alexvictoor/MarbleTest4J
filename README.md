@@ -35,7 +35,8 @@ to use a different package prefix when importing *marbletest4j* classes:
   
 Below a complete RxJava2 example:
 ```
-import static io.reactivex.marble.junit.MarbleRule.*; // for RxJava1 replace by import static rx.marble.junit.MarbleRule.*;
+import static io.reactivex.marble.junit.MarbleRule.*; 
+// import static rx.marble.junit.MarbleRule.*; if RxJava1 is used
 
 @Rule
 public MarbleRule marble = new MarbleRule();
