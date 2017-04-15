@@ -3,9 +3,9 @@
 # MarbleTest4j
 Java port of RxJS marble tests
 
-MarbleTest4j is a tiny library that allows to write tests for codes based on RxJava using marble diagrams in ASCII form.  
+MarbleTest4j is a tiny library that allows to write tests for code based on RxJava and RxJava2 using marble diagrams in ASCII form.  
 This is a Java port of the [marble test features](https://github.com/ReactiveX/rxjs/blob/master/doc/writing-marble-tests.md) of amazing RxJS v5.  
-The purpose of the library is to help you write as concise an readable tests when dealing with Rx code, 
+The purpose of the library is to help you write as concise an readable tests when dealing with reactive code, 
 bringing a developer experience as close as possible as the one of RxJS.  
 Check out this nice [7 minutes introduction on egghead.io](https://egghead.io/lessons/rxjs-introduction-to-rxjs-marble-testing) to get up to speed with RxJS marble testing.  
 
@@ -16,7 +16,7 @@ To get the lib just use add a maven dependency as below:
 <dependency>
   <groupId>com.github.alexvictoor</groupId>
   <artifactId>marbletest4j</artifactId>
-  <version>1.1.2</version>
+  <version>1.2</version>
 </dependency>
 ```
 
@@ -26,10 +26,16 @@ This integration is made of a jUnit rule **MarbleRule** and a bunch of static me
 **MarbleScheduler** is very similar to RxJS TestScheduler: it is like RxJava's TestScheduler plus marble related methods to create hot & cold 
 test observables and then perform assertions. Obviously everything is done using marble schemas in ASCII form.     
 **MarbleRule** keeps in a threadlocal reference a **MarbleScheduler** instance that will be used by static aliases methods. 
-Though, for most cases you will not need to manipulate directly any scheduler.   
-Below a complete example:
+Though, for most cases you will not need to manipulate directly any scheduler.  
+*marbletest4j* is compatible with RxJava and RxJava2. Depending on the flavor of RxJava in use in your project, you need 
+to use a different package prefix when importing *marbletest4j* classes:
+ 
+- *rx.marble* for RxJava1 projects
+- *io.reactivex.marble* for RxJava2 projects
+  
+Below a complete RxJava2 example:
 ```
-import static rx.marble.junit.MarbleRule.*;
+import static io.reactivex.marble.junit.MarbleRule.*; // for RxJava1 replace by import static rx.marble.junit.MarbleRule.*;
 
 @Rule
 public MarbleRule marble = new MarbleRule();
@@ -48,8 +54,12 @@ In the example above, we create first a hot observable trigering events 'a', 'b'
 Then we perform some transformations, using rx map operator, and last we perform an assertion on generated Observable.  
 In previous example event values were strings, other types are also supported:
 ```
-import static rx.marble.junit.MarbleRule.*;
-import static rx.marble.MapHelper.of;
+import static io.reactivex.marble.junit.MarbleRule.*;
+import static io.reactivex.marble.MapHelper.of;
+
+// for RxJava1 replace by the following imports
+// import static rx.marble.junit.MarbleRule.*;
+// import static rx.marble.MapHelper.of;
 
 @Rule
 public MarbleRule marble = new MarbleRule();
@@ -132,4 +142,4 @@ the [official RxJS documentation](https://github.com/ReactiveX/rxjs/blob/master/
 ## Advanced features
 
 For a complete listof supported features you can checkout 
-the [tests of the MarbleScheduler class](https://github.com/alexvictoor/MarbleTest4J/blob/master/src/test/java/rx/marble/MarbleSchedulerTest.java).
+the [tests of the MarbleScheduler class](https://github.com/alexvictoor/MarbleTest4J/blob/master/src/test/java/io/reactivex/marble/MarbleSchedulerTest.java).

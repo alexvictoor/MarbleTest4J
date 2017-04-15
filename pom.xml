@@ -5,7 +5,7 @@
 	<groupId>com.github.alexvictoor</groupId>
 	<artifactId>marbletest4j</artifactId>
 	<name>marbletest4j</name>
-	<version>1.2-SNAPSHOT</version>
+	<version>1.3-SNAPSHOT</version>
     <url>https://github.com/alexvictoor/marbletest4j</url>
     <description>Java port of RxJS marble tests</description>
 
