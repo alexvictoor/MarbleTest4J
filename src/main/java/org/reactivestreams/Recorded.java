@@ -1,16 +1,14 @@
-package reactor;
-
-import reactor.core.publisher.Signal;
+package org.reactivestreams;
 
 /**
  * Created by Alexandre Victoor on 05/06/2016.
  */
 public class Recorded<T> {
 
-    public final Signal<T> value;
+    public final Notification<T> value;
     public final long time;
 
-    public Recorded(long time, Signal<T> value) {
+    public Recorded(long time, Notification<T> value) {
         this.time = time;
         this.value = value;
     }
@@ -36,7 +34,7 @@ public class Recorded<T> {
         return !(value != null ? ! notificationsAreEqual(value, recorded.value) : recorded.value != null);
     }
 
-    private boolean notificationsAreEqual(Signal<?> first, Signal<?> second) {
+    private boolean notificationsAreEqual(Notification<?> first, Notification<?> second) {
         if (first == null || second == null) {
             return false;
         }

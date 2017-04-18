@@ -1,43 +1,37 @@
-package reactor;
-
-
-import org.reactivestreams.Subscriber;
-import org.reactivestreams.Subscription;
-import reactor.core.publisher.Flux;
-import reactor.core.scheduler.Scheduler;
+package org.reactivestreams;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-
-public class HotObservable<T> extends Flux<T> implements TestableObservable<T> {
+/**
+ * Created by Alexandre Victoor on 18/04/2017.
+ */
+public class HotPublisher<T> implements Publisher<T>, TestablePublisher<T> {
 
     private final List<Recorded<T>> notifications;
     private final List<Subscriber<? super T>> observers = new ArrayList<>();
     private final Scheduler scheduler;
     List<SubscriptionLog> subscriptions = new ArrayList<>();
 
-    protected HotObservable(Scheduler scheduler, List<Recorded<T>> notifications) {
+    public HotPublisher(Scheduler scheduler, List<Recorded<T>> notifications) {
         this.scheduler = scheduler;
         this.notifications = notifications;
         scheduleNotifications();
     }
 
     private void scheduleNotifications() {
-        Scheduler.Worker worker = scheduler.createWorker();
         for (final Recorded<T> event : notifications) {
-            worker.schedule(new Runnable() {
+            scheduler.schedule(new Runnable() {
                 @Override
                 public void run() {
-                for (Subscriber<? super T> observer : observers){
-                    event.value.accept(observer);
-                    if (!event.value.isOnNext()) {
-                        endSubscriptions(event.time);
+                    for (Subscriber<? super T> observer : observers){
+                        event.value.accept(observer);
+                        if (!event.value.isOnNext()) {
+                            endSubscriptions(event.time);
+                        }
                     }
-                }
                 }
             }, event.time, TimeUnit.MILLISECONDS);
         }
@@ -71,8 +65,8 @@ public class HotObservable<T> extends Flux<T> implements TestableObservable<T> {
             public void cancel() {
                 observers.remove(subscriber);
                 subscriptions.set(
-                    subscriptionIndex,
-                    new SubscriptionLog(subscriptionLog.subscribe, scheduler.now(TimeUnit.MILLISECONDS))
+                        subscriptionIndex,
+                        new SubscriptionLog(subscriptionLog.subscribe, scheduler.now(TimeUnit.MILLISECONDS))
                 );
             }
         });
@@ -86,15 +80,6 @@ public class HotObservable<T> extends Flux<T> implements TestableObservable<T> {
     @Override
     public List<Recorded<T>> getMessages() {
         return Collections.unmodifiableList(notifications);
-    }
-
-    public static <T> HotObservable<T> create(Scheduler scheduler, Recorded<T>... notifications) {
-        return create(scheduler, Arrays.asList(notifications));
-    }
-
-    public static <T> HotObservable<T> create(Scheduler scheduler, List<Recorded<T>> notifications) {
-        HotObservable<T> observable = new HotObservable<>(scheduler, notifications);
-        return observable;
     }
 
 }

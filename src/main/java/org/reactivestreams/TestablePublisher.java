@@ -1,8 +1,8 @@
-package reactor;
+package org.reactivestreams;
 
 import java.util.List;
 
-interface TestableObservable<T> {
+public interface TestablePublisher<T> extends Publisher<T> {
 
     List<SubscriptionLog> getSubscriptions();
 

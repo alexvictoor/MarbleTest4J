@@ -1,4 +1,4 @@
-package reactor;
+package org.reactivestreams;
 
 /**
  * Created by Alexandre Victoor on 08/06/2016.
