@@ -55,8 +55,8 @@ public class Parser {
                         value = (T)String.valueOf(c);
                     } else {
                         value = values.get(String.valueOf(c));
-                        if (materializeInnerObservables && value instanceof ColdPublisher) {
-                            value = (T)((ColdPublisher)value).getMessages();
+                        if (materializeInnerObservables && value instanceof TestablePublisher) {
+                            value = (T)((TestablePublisher)value).getMessages();
                         }
                     }
                     notification = Notification.createOnNext(value);

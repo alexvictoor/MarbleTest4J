@@ -16,9 +16,23 @@ public class Recorded<T> {
     @Override
     public String toString() {
 
+        final String valueString;
+
+        switch (value.getKind()) {
+            case OnComplete:
+                valueString = "On Complete";
+                break;
+            case OnError:
+                valueString =  "On Error";
+                break;
+            default:
+                valueString = "On Next: " + value.getValue();
+        }
+
+
         return "{\n" +
                 "  time = " + time +
-                "\n  " + value +
+                "\n  " + valueString +
                 "\n}";
     }
 
