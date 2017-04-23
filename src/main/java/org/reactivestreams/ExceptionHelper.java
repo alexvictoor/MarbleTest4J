@@ -4,13 +4,18 @@ package org.reactivestreams;
 public class ExceptionHelper {
 
 
-    public static String findCallerInStackTrace(Class callee) {
+    public static String findCallerInStackTrace(Class... callees) {
         StackTraceElement[] stackTrace = new Exception().getStackTrace();
         StackTraceElement current = null;
         for (StackTraceElement element : stackTrace) {
             current = element;
-            if (!element.getClassName().endsWith(callee.getSimpleName())
-                    && !element.getClassName().endsWith(ExceptionHelper.class.getSimpleName())) {
+            boolean elementFromCallees = false;
+            String elementClassName = element.getClassName();
+            for (Class callee : callees) {
+                elementFromCallees |= elementClassName.endsWith(callee.getSimpleName());
+            }
+            if (!elementFromCallees
+                    && !elementClassName.endsWith(ExceptionHelper.class.getSimpleName())) {
                 break;
             }
         }
