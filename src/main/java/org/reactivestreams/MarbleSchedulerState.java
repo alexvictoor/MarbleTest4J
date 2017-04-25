@@ -13,7 +13,7 @@ public class MarbleSchedulerState {
 
     private final List<ITestOnFlush> flushTests = new ArrayList<>();
     private final long frameTimeFactor;
-    private final ISchedule scheduler;
+    protected final ISchedule scheduler;
     private final Class schedulerClass;
 
     public MarbleSchedulerState(long frameTimeFactor, ISchedule scheduler, Class schedulerClass) {
@@ -33,7 +33,7 @@ public class MarbleSchedulerState {
     }
 
     public <T> ISetupTest expectPublisher(Publisher<T> publisher, String unsubscriptionMarbles) {
-        String caller = ExceptionHelper.findCallerInStackTrace(schedulerClass, getClass());
+        String caller = ExceptionHelper.findCallerInStackTrace(schedulerClass, MarbleSchedulerState.class);
         FlushableTest flushTest = new FlushableTest(caller);
         final List<Recorded<?>> actual = new ArrayList<>();
         flushTest.actual = actual;
@@ -60,7 +60,7 @@ public class MarbleSchedulerState {
         return new SetupTest(flushTest, frameTimeFactor);
     }
 
-    private List<Recorded<Object>> materializeInnerPublisher(final Publisher publisher, final ISchedule clock) {
+    protected List<Recorded<Object>> materializeInnerPublisher(final Publisher publisher, final ISchedule clock) {
         final List<Recorded<Object>> messages = new ArrayList<>();
         final long outerFrame = clock.now();
         publisher.subscribe(new Subscriber() {
@@ -88,6 +88,14 @@ public class MarbleSchedulerState {
         return messages;
     }
 
+    // Hack to be able to handle rxjava's observables in flowables
+    protected Object materializeInnerStreamWhenNeeded(Object value) {
+        if (value instanceof Publisher) {
+            return materializeInnerPublisher((Publisher) value, scheduler);
+        }
+        return value;
+    }
+
     private class SubscriberForExpect<T> implements Subscriber<T> {
 
         public Subscription subscription;
@@ -107,11 +115,8 @@ public class MarbleSchedulerState {
 
         @Override
         public void onNext(T x) {
-            Object value = x;
-            // Support Publisher-of-Publishers
-            if (value instanceof Publisher) {
-                value = materializeInnerPublisher((Publisher) value, clock);
-            }
+            // Support Publisher-of-Publishers & Publisher-of-Observables
+            Object value = materializeInnerStreamWhenNeeded(x);
             actual.add(new Recorded<>(clock.now(), (Notification<?>)Notification.createOnNext(value)));
         }
 
@@ -128,7 +133,7 @@ public class MarbleSchedulerState {
 
 
     public ISetupSubscriptionsTest expectSubscriptions(List<SubscriptionLog> subscriptions) {
-        String caller = ExceptionHelper.findCallerInStackTrace(schedulerClass, getClass());
+        String caller = ExceptionHelper.findCallerInStackTrace(schedulerClass, MarbleSchedulerState.class);
         FlushableSubscriptionTest flushTest = new FlushableSubscriptionTest(caller);
         flushTest.actual = subscriptions;
         flushTests.add(flushTest);

@@ -6,4 +6,8 @@ public class ExpectObservableException extends RuntimeException {
         super(message + "\n\n from assertion at " + caller + "\n\n----------------------\n");
     }
 
+    public ExpectObservableException(String message) {
+        super(message);
+    }
+
 }

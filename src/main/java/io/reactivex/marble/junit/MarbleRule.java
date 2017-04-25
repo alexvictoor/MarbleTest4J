@@ -6,6 +6,9 @@ import io.reactivex.marble.*;
 import org.junit.rules.TestRule;
 import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
+import org.reactivestreams.ISetupSubscriptionsTest;
+import org.reactivestreams.ISetupTest;
+import org.reactivestreams.SubscriptionLog;
 
 import java.util.List;
 import java.util.Map;

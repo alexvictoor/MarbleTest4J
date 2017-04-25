@@ -1,9 +1,11 @@
 package io.reactivex.marble;
 
-import io.reactivex.Notification;
 import io.reactivex.observers.TestObserver;
 import io.reactivex.schedulers.TestScheduler;
 import org.junit.Test;
+import org.reactivestreams.Notification;
+import org.reactivestreams.Recorded;
+import org.reactivestreams.SubscriptionLog;
 
 import java.util.concurrent.TimeUnit;
 

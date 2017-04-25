@@ -240,6 +240,8 @@ public class MarbleSchedulerTest {
             scheduler.flush();
         } catch(ExpectSubscriptionsException ex) {
             assertThat(ex.getMessage()).contains("from assertion at " + getClass().getCanonicalName());
+        } catch (Exception e) {
+            System.out.println("coucou" + e);
         }
     }
 
