@@ -26,7 +26,7 @@ public class HotPublisher<T> implements Publisher<T>, TestablePublisher<T> {
             scheduler.schedule(new Runnable() {
                 @Override
                 public void run() {
-                    for (Subscriber<? super T> observer : observers){
+                    for (Subscriber<? super T> observer : new ArrayList<>(observers)){
                         event.value.accept(observer);
                         if (!event.value.isOnNext()) {
                             endSubscriptions(event.time);
