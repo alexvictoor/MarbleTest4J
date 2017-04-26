@@ -52,31 +52,31 @@ public class MarbleRule implements TestRule {
     }
 
     public static ISetupTest expectFlowable(Flowable<?> actual) {
-        return schedulerHolder.get().expectObservable(actual.toObservable());
+        return schedulerHolder.get().expectFlowable(actual);
     }
 
     public static ISetupTest expectFlowable(Flowable<?> actual, String unsubscriptionMarbles) {
-        return schedulerHolder.get().expectObservable(actual.toObservable(), unsubscriptionMarbles);
+        return schedulerHolder.get().expectFlowable(actual, unsubscriptionMarbles);
     }
 
     public static ISetupTest expectSingle(Single<?> actual) {
-        return schedulerHolder.get().expectObservable(actual.toObservable());
+        return schedulerHolder.get().expectFlowable(actual.toFlowable());
     }
 
     public static ISetupTest expectSingle(Single<?> actual, String unsubscriptionMarbles) {
-        return schedulerHolder.get().expectObservable(actual.toObservable(), unsubscriptionMarbles);
+        return schedulerHolder.get().expectFlowable(actual.toFlowable(), unsubscriptionMarbles);
     }
 
     public static ISetupTest expectMaybe(Maybe<?> actual) {
-        return schedulerHolder.get().expectObservable(actual.toObservable());
+        return schedulerHolder.get().expectFlowable(actual.toFlowable());
     }
 
     public static ISetupTest expectCompletable(Completable actual, String unsubscriptionMarbles) {
-        return schedulerHolder.get().expectObservable(actual.toObservable(), unsubscriptionMarbles);
+        return schedulerHolder.get().expectFlowable(actual.toFlowable(), unsubscriptionMarbles);
     }
 
     public static ISetupTest expectCompletable(Completable actual) {
-        return schedulerHolder.get().expectObservable(actual.toObservable());
+        return schedulerHolder.get().expectFlowable(actual.toFlowable());
     }
 
     public static ISetupTest expectMaybe(Maybe<?> actual, String unsubscriptionMarbles) {

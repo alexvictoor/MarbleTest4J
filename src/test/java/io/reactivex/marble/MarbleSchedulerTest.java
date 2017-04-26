@@ -2,11 +2,8 @@ package io.reactivex.marble;
 
 
 import io.reactivex.Observable;
-import io.reactivex.Observer;
-import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Function;
 import io.reactivex.observers.TestObserver;
-import io.reactivex.subjects.BehaviorSubject;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -212,7 +209,7 @@ public class MarbleSchedulerTest {
         scheduler.expectObservable(Observable.just("hello")).toBe("--h|");
         try {
             scheduler.flush();
-        } catch(ExpectObservableException ex) {
+        } catch(ExpectFlowableException ex) {
             assertThat(ex.getMessage()).contains("from assertion at " + getClass().getCanonicalName());
         }
     }
@@ -223,7 +220,7 @@ public class MarbleSchedulerTest {
         scheduler.expectObservable(Observable.just("hello")).toBe("--h#", of("h", "hola"), new Exception());
         try {
             scheduler.flush();
-        } catch(ExpectObservableException ex) {
+        } catch(ExpectFlowableException ex) {
             assertThat(ex.getMessage()).contains("hello");
             assertThat(ex.getMessage()).contains("On Error");
         }

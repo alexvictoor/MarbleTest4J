@@ -97,7 +97,7 @@ public class MarbleScheduler extends Scheduler {
         try {
             state.flush();
         } catch (ExpectPublisherException ex) {
-            throw new ExpectObservableException(ex.getMessage());
+            throw new ExpectFlowableException(ex.getMessage());
         } catch (ExpectSubscriptionsException ex) {
             throw new io.reactivex.marble.ExpectSubscriptionsException(ex.getMessage());
         }
@@ -109,6 +109,14 @@ public class MarbleScheduler extends Scheduler {
 
     public <T> ISetupTest expectObservable(Observable<T> observable, String unsubscriptionMarbles) {
         return state.expectPublisher(observable.toFlowable(BackpressureStrategy.BUFFER), unsubscriptionMarbles);
+    }
+
+    public <T> ISetupTest expectFlowable(Flowable<T> flowable) {
+        return expectFlowable(flowable, null);
+    }
+
+    public <T> ISetupTest expectFlowable(Flowable<T> flowable, String unsubscriptionMarbles) {
+        return state.expectPublisher(flowable, unsubscriptionMarbles);
     }
 
     public ISetupSubscriptionsTest expectSubscriptions(List<SubscriptionLog> subscriptions) {
