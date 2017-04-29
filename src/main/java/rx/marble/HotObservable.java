@@ -1,6 +1,5 @@
 package rx.marble;
 
-import rx.Notification;
 import rx.Observable;
 import rx.Scheduler;
 import rx.Subscriber;
