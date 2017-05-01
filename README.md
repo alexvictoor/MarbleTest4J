@@ -1,9 +1,9 @@
 [![Build Status](https://travis-ci.org/alexvictoor/MarbleTest4J.svg?branch=master)](https://travis-ci.org/alexvictoor/MarbleTest4J)
 [![Quality Gate](https://sonarqube.com/api/badges/gate?key=com.github.alexvictoor%3Amarbletest4j)](https://sonarqube.com/dashboard/index/com.github.alexvictoor%3Amarbletest4j)
 # MarbleTest4j
-Java port of RxJS marble tests
+Java port of RxJS marble tests, works with RxJava, RxJava2 and Reactor3
 
-MarbleTest4j is a tiny library that allows to write tests for code based on RxJava and RxJava2 using marble diagrams in ASCII form.  
+MarbleTest4j is a tiny library that allows to write tests using marble diagrams in ASCII form.  
 This is a Java port of the [marble test features](https://github.com/ReactiveX/rxjs/blob/master/doc/writing-marble-tests.md) of amazing RxJS v5.  
 The purpose of the library is to help you write as concise an readable tests when dealing with reactive code, 
 bringing a developer experience as close as possible as the one of RxJS.  
@@ -16,7 +16,22 @@ To get the lib just use add a maven dependency as below:
 <dependency>
   <groupId>com.github.alexvictoor</groupId>
   <artifactId>marbletest4j</artifactId>
-  <version>1.2</version>
+  <version>1.3</version>
+</dependency>
+```
+
+You will need also to import the reactive library used in your project (RxJava, RxJava2 or Reactor3).  
+When using Reactor3, you also need to import the *reactor-test* module as follow:
+```xml
+<dependency>
+  <groupId>io.projectreactor</groupId>
+  <artifactId>reactor-core</artifactId>
+  <version>${reactor.version}</version>
+</dependency>
+<dependency>
+  <groupId>io.projectreactor.addons</groupId>
+  <artifactId>reactor-test</artifactId>
+  <version>${reactor.version}</version>
 </dependency>
 ```
 
@@ -30,8 +45,9 @@ Though, for most cases you will not need to manipulate directly any scheduler.
 *marbletest4j* is compatible with RxJava and RxJava2. Depending on the flavor of RxJava in use in your project, you need 
 to use a different package prefix when importing *marbletest4j* classes:
  
-- *rx.marble* for RxJava1 projects
-- *io.reactivex.marble* for RxJava2 projects
+- *rx.marble* & *rx.marble.junit* for RxJava1 projects
+- *io.reactivex.marble* & *io.reactivex.marble.junit* for RxJava2 projects
+- *reactor* & *reactor.junit* for Reactor3 projects
   
 Below a complete RxJava2 example:
 ```
@@ -53,7 +69,29 @@ public void should_map() {
 ```
 In the example above, we create first a hot observable trigering events 'a', 'b', 'c', 'd' (at 0, 20, 50 and 90)  
 Then we perform some transformations, using rx map operator, and last we perform an assertion on generated Observable.  
-In previous example event values were strings, other types are also supported:
+  
+If you are into Reactor3, the API is quite similar as you can see in the simple example below:
+```
+import static reactor.MapHelper.of;
+import static reactor.junit.MarbleRule.*;
+  
+@Rule
+public MarbleRule marbleRule = new MarbleRule();
+
+@Test
+public void should_concat_with_scan() {
+  // given
+  HotFlux<String> flux = hot( "--a--b--c");
+  // when
+  Flux<String> concatFlux = flux.scan((x, y) -> x + " " + y);
+  // then
+  expectFlux(concatFlux).toBe("--A--B--C", of("A", "a", "B", "a b", "C", "a b c"));
+}
+```
+  
+  
+In previous examples, event values were strings, other types are also supported. Below an RxJava2 example but obviously 
+reactor API is once again quite similar:
 ```
 import static io.reactivex.marble.junit.MarbleRule.*;
 import static io.reactivex.marble.MapHelper.of;
